@@ -18,6 +18,7 @@
 
 ## 🧱 MongoDB Data Model Overview
 
+<img width="1553" height="1068" alt="mongodb_erd" src="https://github.com/user-attachments/assets/37dabf57-1340-493f-96cb-8a9e10ecce9b" />
 
 ---
 
