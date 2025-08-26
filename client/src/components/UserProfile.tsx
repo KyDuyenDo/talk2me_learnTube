@@ -21,11 +21,9 @@ const UserProfile: FunctionComponent<UserProfileProps> = () => {
     }, [])
 
     return (
-        <div className="relative" ref={containerRef}>
-            <div className="flex justify-center items-center">
-                <p className="w-5 text-[12px] font-[700] text-[#606070]">Ky</p>
-                <button onClick={() => setShowDropDown(!showDropDown)}>{<UserIcon />}</button>
-            </div>
+        <div className="relative flex justify-center items-center" ref={containerRef}>
+            <p className="w-5 text-[12px] font-[700] text-[#606070]">Ky</p>
+            <button onClick={() => setShowDropDown(!showDropDown)}>{<UserIcon />}</button>
             {
                 showDropDown && (
                     <div className="absolute transition-all duration-500 right-0 top-[64px] p-4 min-w-[240px] border border-[#e6e6eb] bg-amber-100">
