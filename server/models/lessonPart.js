@@ -1,0 +1,28 @@
+import mongoose from "mongoose";
+
+const { Schema } = mongoose;
+
+const lessonPartSchema = new Schema({
+    courseId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'course'
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: ['quiz', 'writing', 'speaking'],
+        trim: true
+    },
+    completed: {
+        type: Boolean,
+        default: false
+    },
+    updateAt: {
+        type: Date,
+        default: Date.now
+    },
+});
+
+const LessonPart = mongoose.model('lessonPart', lessonPartSchema);
+export default LessonPart;
