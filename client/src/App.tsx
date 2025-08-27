@@ -1,13 +1,16 @@
 import './App.css'
 import Navbar from './components/Navbar'
-import LoginPage from './features/auth/pages/Login'
+import HomePage from './features/home/pages/Home'
+import CoursesPage from './pages/Courses'
 
 function App() {
 
   return (
     <>
       <Navbar />
-      <LoginPage />
+      {/* <HomePage /> */}
+      <CoursesPage />
+      {/* <LoginPage /> */}
     </>
   )
 }
