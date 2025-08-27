@@ -1,11 +1,8 @@
 import type { FunctionComponent } from "react";
 import UserProfile from "./UserProfile";
 
-interface NavbarProps {
 
-}
-
-const Navbar: FunctionComponent<NavbarProps> = () => {
+const Navbar: FunctionComponent = () => {
     const navbarItem = ["Home", "Courses", "My Report", "Flash Card"]
     return (
         <div className="flex justify-between py-4 px-10 pb-0">

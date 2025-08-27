@@ -1,10 +1,6 @@
 import type { FunctionComponent } from "react";
 
-interface HomePageProps {
-
-}
-
-const HomePage: FunctionComponent<HomePageProps> = () => {
+const HomePage: FunctionComponent = () => {
     return (
         <div className="p-7">
             <div className="p-3">

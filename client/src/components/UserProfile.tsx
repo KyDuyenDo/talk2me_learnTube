@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import { UserIcon } from "../utils/constant/icon";
 
-interface UserProfileProps {
-
-}
+type UserProfileProps = Record<string, never>;
 
 const UserProfile: FunctionComponent<UserProfileProps> = () => {
     const [showDropDown, setShowDropDown] = useState(false)
