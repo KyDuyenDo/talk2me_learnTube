@@ -6,7 +6,7 @@ interface NavbarProps {
 }
 
 const Navbar: FunctionComponent<NavbarProps> = () => {
-    const navbarItem = ["Home", "Courses", "My Report"]
+    const navbarItem = ["Home", "Courses", "My Report", "Flash Card"]
     return (
         <div className="flex justify-between py-4 px-10 pb-0">
             <div className="logo"></div>

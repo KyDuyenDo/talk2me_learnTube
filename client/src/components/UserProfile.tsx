@@ -26,7 +26,7 @@ const UserProfile: FunctionComponent<UserProfileProps> = () => {
             <button onClick={() => setShowDropDown(!showDropDown)}>{<UserIcon />}</button>
             {
                 showDropDown && (
-                    <div className="absolute transition-all duration-500 right-0 top-[64px] p-4 min-w-[240px] border border-[#e6e6eb] bg-amber-100">
+                    <div className="absolute transition-all duration-500 right-0 top-[64px] p-4 min-w-[240px] border-2 border-[#e6e6eb] rounded-md">
                         {
                             dropDownItem.map((item, index) => (
                                 <p className={`${index == 0 ? 'pt-[12px] pb-[24px]' : 'pb-[12px]'}  pl-[16px] text-[16px] font-[400] hover:cursor-pointer`}>{item}</p>

@@ -74,7 +74,7 @@ const LoginPage: FunctionComponent<LoginPageProps> = () => {
     <div className="h-[100vh] w-[100vw]">
       <div className="h-[64px]"></div>
       <div className="m-auto max-w-[520px] pt-[10px] items-center text-center">
-        <div className="relative py-[32px] px-[40px] border-2 border-[#e6e6eb] w-full rounded-sm">
+        <div className="relative py-[32px] px-[40px] border-2 border-[#e6e6eb] w-full rounded-md">
           <div className="flex header text-left mb-4">
             <h1 className="leading-[46px] text-[40px] font-[900] max-w-[278px] mb-4">Login</h1>
             <img
