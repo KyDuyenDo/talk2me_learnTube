@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 function MainLayout() {
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <Outlet /> {/* chỗ để render các route con */}
     </div>
   );

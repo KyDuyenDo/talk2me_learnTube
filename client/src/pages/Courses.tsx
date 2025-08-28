@@ -6,7 +6,9 @@ interface CoursesPageProps {
  
 const CoursesPage: FunctionComponent<CoursesPageProps> = () => {
     return ( 
-        <div></div>
+        <div>
+            <div className="search-bar"></div>
+        </div>
      );
 }
  
