@@ -1,12 +1,25 @@
 import type { FunctionComponent } from "react";
+import { Slider } from "../components/Slider";
+import { CourseCard } from "../../courses/components/CourseCard";
+import { sampleCourses } from "../../courses/pages/Courses";
 
 const HomePage: FunctionComponent = () => {
     return (
         <div className="p-7">
             <div className="p-3">
                 <div className="flex items-center mb-7">
-                    <span className="leading-[24px] text-[24px] font-[700] text-[#1b1f2e]">Flash Card</span>
-                    <a className="ml-8 text-blue-600 text-[16px] font-[700] text-center">View all</a>
+                    <Slider
+                        title="Khóa Học Nổi Bật"
+                        onClickViewAll={() => (window.location.href = "/courses")}
+                        lengthView={sampleCourses.length}
+                        itemsPerView={4}
+                    >
+                        {sampleCourses.map((course) => (
+                            <div key={course.id} className="w-1/4 flex-shrink-0 px-0">
+                                <CourseCard course={course} />
+                            </div>
+                        ))}
+                    </Slider>
                 </div>
                 <div></div>
             </div>
