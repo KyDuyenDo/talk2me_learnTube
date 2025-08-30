@@ -2,6 +2,7 @@ import type { FunctionComponent } from "react";
 import { Slider } from "../components/Slider";
 import { CourseCard } from "../../courses/components/CourseCard";
 import { sampleCourses } from "../../courses/pages/Courses";
+import FlashCardDetail from "../components/FlashCardDetail";
 
 const HomePage: FunctionComponent = () => {
     return (
@@ -9,13 +10,27 @@ const HomePage: FunctionComponent = () => {
             <div className="p-3">
                 <div className="flex items-center mb-7">
                     <Slider
-                        title="Khóa Học Nổi Bật"
+                        title="Flash Card"
                         onClickViewAll={() => (window.location.href = "/courses")}
                         lengthView={sampleCourses.length}
                         itemsPerView={4}
                     >
                         {sampleCourses.map((course) => (
-                            <div key={course.id} className="w-1/4 flex-shrink-0 px-0">
+                            <div key={course.id} className="w-1/4 flex-shrink-0">
+                                <FlashCardDetail onClick={() => { }} title={course.title} />
+                            </div>
+                        ))}
+                    </Slider>
+                </div>
+                <div className="flex items-center mb-7">
+                    <Slider
+                        title="Courses"
+                        onClickViewAll={() => (window.location.href = "/courses")}
+                        lengthView={sampleCourses.length}
+                        itemsPerView={4}
+                    >
+                        {sampleCourses.map((course) => (
+                            <div key={course.id} className="w-1/4 flex-shrink-0">
                                 <CourseCard course={course} />
                             </div>
                         ))}

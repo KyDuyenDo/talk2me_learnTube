@@ -7,12 +7,13 @@ interface Course {
 }
 
 interface CourseCardProps {
-  course: Course
+  course: Course,
+  onClick?: () => void
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({ course, onClick }: CourseCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+    <a onClick={onClick} className="cursor-pointer bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       <div className="flex flex-col">
         <div className="relative aspect-video overflow-hidden">
           <img src={course.thumbnail || "/placeholder.svg"} alt={course.title} className="object-cover" />
@@ -24,6 +25,6 @@ export function CourseCard({ course }: CourseCardProps) {
           <p className="text-xs text-gray-600 mt-1">{course.channel}</p>
         </div>
       </div>
-    </div>
+    </a>
   )
 }

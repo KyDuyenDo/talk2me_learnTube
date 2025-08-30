@@ -6,6 +6,7 @@ import HomePage from './features/home/pages/Home';
 import QuizResults from './features/report/pages/Report';
 import { CourseGrid } from './features/courses/pages/Courses';
 import QuizPage from './features/courses/pages/Quiz';
+import DetailCourses from './features/courses/pages/DetailCourse';
 function App() {
 
   return (
@@ -16,8 +17,9 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CourseGrid />} />
-          <Route path="/report" element={<QuizPage />} />
+          <Route path="/report" element={<QuizResults />} />
         </Route>
+         <Route path="/courses/:id" element={<DetailCourses />} />
       </Routes>
     </BrowserRouter>
   )
