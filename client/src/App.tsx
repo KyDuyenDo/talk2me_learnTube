@@ -3,7 +3,9 @@ import LoginPage from './features/auth/pages/Login'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from './routes/mainLayout';
 import HomePage from './features/home/pages/Home';
-import CoursesPage from './pages/Courses';
+import QuizResults from './features/report/pages/Report';
+import { CourseGrid } from './features/courses/pages/Courses';
+import DetailCourses from './features/courses/pages/DetailCourse';
 function App() {
 
   return (
@@ -13,9 +15,10 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/report" element={<h1>Report Page</h1>} />
+          <Route path="/courses" element={<CourseGrid />} />
+          <Route path="/report" element={<QuizResults />} />
         </Route>
+         <Route path="/courses/:id" element={<DetailCourses />} />
       </Routes>
     </BrowserRouter>
   )

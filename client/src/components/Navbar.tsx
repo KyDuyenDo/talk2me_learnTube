@@ -2,7 +2,6 @@ import type { FunctionComponent } from "react";
 import UserProfile from "./UserProfile";
 import { NavLink, useLocation } from "react-router-dom";
 
-
 const Navbar: FunctionComponent = () => {
     const navbarItem = [{
         title: "Home",
@@ -37,6 +36,6 @@ const Navbar: FunctionComponent = () => {
             <UserProfile />
         </div>
     );
-}
+};
 
 export default Navbar;
