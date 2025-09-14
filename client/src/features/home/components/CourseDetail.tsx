@@ -8,7 +8,7 @@ interface CourseDetailProps {
 const CourseDetail: FunctionComponent<CourseDetailProps> = (props) => {
     return (
         <a onClick={props.onClick} className="w-1/4 flex-shrink-0 px-2 ">
-            <div className="bg-gray-300 rounded-md p-6">
+            <div className="bg-gray-200 rounded-md p-6">
                 <div className="hero">
                     <img width={120} height={120} src="https://storage.googleapis.com/smalltalk2/assets/tvshow_s.png" />
                 </div>
