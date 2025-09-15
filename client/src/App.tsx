@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from './routes/mainLayout';
 import HomePage from './features/home/pages/Home';
 import QuizResults from './features/report/pages/Report';
-import { CourseGrid } from './features/courses/pages/Courses';
 import DetailCourses from './features/courses/pages/DetailCourse';
 import { CourseGridWithPagination } from './features/courses/components/CourseGridWithPagination';
 function App() {
