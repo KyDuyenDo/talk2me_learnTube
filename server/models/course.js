@@ -2,22 +2,27 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const courseSchema = new Schema({
-    folderId: {
+    categoryId: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'folder'
+        ref: 'category'
     },
     title: {
         type: String,
         required: true,
         trim: true
     },
-    videoUrl: {
+    youtubeUrl: {
         type: String,
         required: true,
         trim: true
     },
     subtitle: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    thumbnail: {
         type: String,
         required: true,
         trim: true

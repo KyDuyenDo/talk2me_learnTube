@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const folderSchema = new Schema({
+const categorySchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'user'
     },
-    title: {
+    label: {
         type: String,
         required: true,
         trim: true
@@ -19,5 +19,5 @@ const folderSchema = new Schema({
     },
 });
 
-const Folder = mongoose.model('folder', folderSchema);
-export default Folder;
+const Category = mongoose.model('category', categorySchema);
+export default Category;

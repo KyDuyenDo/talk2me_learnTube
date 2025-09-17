@@ -25,11 +25,11 @@ const questionSchema = new Schema({
     },
     choices: {
         type: [String],
-        required: function() {
+        required: function () {
             return this.type === 'quiz';
         },
         validate: {
-            validator: function(v) {
+            validator: function (v) {
                 return Array.isArray(v) && v.length > 0;
             },
             message: 'Choices must be a non-empty array.'
@@ -37,11 +37,11 @@ const questionSchema = new Schema({
     },
     correctIndex: {
         type: Number,
-        required: function() {
+        required: function () {
             return this.type === 'quiz';
         },
         validate: {
-            validator: function(v) {
+            validator: function (v) {
                 return Number.isInteger(v) && v >= 0 && v < (this.choices ? this.choices.length : 0);
             },
             message: 'Correct index must be a valid index of the choices array.'
@@ -49,9 +49,7 @@ const questionSchema = new Schema({
     },
     referenceAnswer: {
         type: String,
-        required: function() {
-            return this.type === 'writing' || this.type === 'speaking';
-        },
+        required: true,
         trim: true
     },
     createdAt: {
