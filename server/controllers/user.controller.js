@@ -12,7 +12,7 @@ const signIn = async (req, res, next) => {
             });
         }
 
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await bcrypt.compare(password, user.passwordHash);
         if (!validPassword) {
             return res.status(401).json({
                 message: "Invalid email or password"
