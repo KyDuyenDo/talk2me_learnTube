@@ -1,0 +1,150 @@
+import os
+from datetime import datetime
+from typing import List, Literal, Optional
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv(override=True)
+
+
+class QuizItem(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: Literal["A", "B", "C", "D"]
+    explanation: str
+
+class QuizSet(BaseModel):
+    questions: List[QuizItem]
+
+class OpenQuestion(BaseModel):
+    prompt: str
+    referenceAnswer: Optional[str]
+
+
+class QuestionGenerator:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(QuestionGenerator, cls).__new__(cls)
+            cls._instance._init_openai()
+        return cls._instance
+
+    def _init_openai(self):
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
+
+        self.prompts = {
+            "quiz": """
+                You are an AI English Teaching Assistant specializing in grammar and vocabulary.  
+                Your task: process English subtitles from a YouTube conversation and create a quiz.  
+
+                Instructions:
+                1. Focus ONLY on **English grammar** (tenses, articles, prepositions, sentence structure) and **vocabulary** (word meaning, collocations, phrasal verbs, synonyms/antonyms, usage).  
+                2. Each question must be in the style of **standard English test MCQs** (like TOEIC or IELTS).  
+                3. Do NOT create questions about culture, rhetorical devices, discourse analysis, or speaker intentions.  
+                4. Explanations must be clear, simple, and teacher-like.  
+                5. You MUST create at least 10 MCQs (preferably 12–15).  
+
+                Generate in this JSON format:
+                    {
+                        "question": "...",
+                        "options": ["option1", "option2", "option3", "option4"],
+                        "correct_answer": "the correct option (exact text from options)",
+                        "explanation": "clear explanation like a teacher"
+                    }
+                """,
+            "writing": """
+            You are an AI English Teacher.  
+            Task: generate writing practice questions.  
+            Each item must follow:
+            {
+              "prompt": "Write about ...",
+              "referenceAnswer": "..."
+            }
+            Return at least 5 tasks.
+            """,
+
+            "speaking": """
+            You are an AI English Teacher.  
+            Task: generate speaking practice questions.  
+            Each item must follow:
+            {
+              "prompt": "Talk about ...",
+              "referenceAnswer": "..."
+            }
+            Return at least 5 tasks.
+            """
+        }
+
+    def generate_quiz(self, transcript_text: str) -> QuizSet:
+        messages = [
+            {"role": "system", "content": self.prompts["quiz"]},
+            {"role": "user", "content": transcript_text}
+        ]
+        response = self.client.chat.completions.parse(
+            model="deepseek/deepseek-r1:free",
+            messages=messages,
+            response_format=QuizSet
+        )
+        return response.choices[0].message.parsed
+
+    def generate_open_questions(self, text: str, task_type: str) -> List[OpenQuestion]:
+        messages = [
+            {"role": "system", "content": self.prompts[task_type]},
+            {"role": "user", "content": text}
+        ]
+        response = self.client.chat.completions.parse(
+            model="deepseek/deepseek-r1:free",
+            messages=messages,
+            response_format=List[OpenQuestion]
+        )
+        return response.choices[0].message.parsed
+
+    def to_node_format_quiz(self, quizset: QuizSet):
+        quiz_questions = []
+        for i, q in enumerate(quizset.questions, start=1):
+            quiz_questions.append({
+                "lessonPartId": "",
+                "type": "quiz",
+                "order": i,
+                "prompt": q.question,
+                "choices": q.options,
+                "correctIndex": ord(q.correct_answer) - ord("A"),
+                "referenceAnswer": q.explanation,
+                "createdAt": datetime.now().strftime("%d/%m/%Y")
+            })
+        return quiz_questions
+
+    def to_node_format_open(self, items: List[OpenQuestion], task_type: str):
+        node_questions = []
+        for i, q in enumerate(items, start=1):
+            node_questions.append({
+                "lessonPartId": "",
+                "type": task_type,
+                "order": i,
+                "prompt": q.prompt,
+                "referenceAnswer": q.referenceAnswer,
+                "createdAt": datetime.now().strftime("%d/%m/%Y")
+            })
+        return node_questions
+
+
+if __name__ == "__main__":
+    gen = QuestionGenerator()
+
+    quizset = gen.generate_quiz("Yesterday I was walking in the park and saw a dog.")
+    quiz_nodes = gen.to_node_format_quiz(quizset)
+
+    writing = gen.generate_open_questions("Theme: animals", "writing")
+    writing_nodes = gen.to_node_format_open(writing, "writing")
+
+    speaking = gen.generate_open_questions("Theme: daily routine", "speaking")
+    speaking_nodes = gen.to_node_format_open(speaking, "speaking")
+
+    print("QUIZ:", quiz_nodes[:1])
+    print("WRITING:", writing_nodes[:1])
+    print("SPEAKING:", speaking_nodes[:1])

@@ -1,53 +1,94 @@
 const Course = require("../models/course");
+const axios = require("axios");
+const LessonPart = require("../models/lessonPart");
+const Question = require("../models/question");
 
 
 const createCourse = async (req, res, next) => {
     const { youtubeUrl, categoryId } = req.body;
-    // call difference server to getting information
-    const newCourse = Course({
-        categoryId,
-        youtubeUrl,
-        title: "",
-        subtitle: "",
-        createdAt: "",
-        thumbnail: ""
-    })
+    
+    try {
+        const info = await axios.post(
+            "http://127.0.0.1:5000/api/generate/info",
+            { youtubeUrl },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-API-KEY": "12345",
+                },
+            }
+        );
 
-    // call api to generate questions for quiz
-    const quizQuestions = [{
-        lessonPartId: "",
-        type: "quiz",
-        order: 1,
-        prompt: "1+1 = ?",
-        choices: ["2", "3", "4", "6"],
-        correctIndex: 1,
-        referenceAnswer: "explanation",
-        createdAt: "22/12/2025"
-    }]
+        const newCourse = Course({
+            categoryId,
+            youtubeUrl,
+            ...info,
+            createdAt: Date.now(),
+        })
+
+        // newCourse.save()
+
+        // const lessonPart = new LessonPart({
+        //   courseId: newCourse._id, 
+        //   type: "quiz",
+        //   completed: false,
+        // });
+
+        // lessonPart.save();
+
+        // call api to generate questions for quiz
+        const quizQuestions = await axios.post(
+            "http://127.0.0.1:5000/api/generate/quiz",
+            { youtubeUrl },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-API-KEY": "12345",
+                },
+            }
+        );
+
+        // quizQuestions.array.forEach(element => {
+        //     const quiz = Question({
+        //         lessonPartId: lessonPart._id,
+        //         ...element,
+        //     })
+        //     // quiz.save()
+        // });
 
 
-    // cal api to generate questions for writing
-    const writingQuestions = [{
-        lessonPartId: "",
-        type: "writing",
-        order: 1,
-        prompt: "Describe a cat",
-        referenceAnswer: "Black cat",
-        createdAt: "22/12/2025"
-    }]
+        // cal api to generate questions for writing
+        // const writingQuestions = [{
+        //     lessonPartId: "",
+        //     type: "writing",
+        //     order: 1,
+        //     prompt: "Describe a cat",
+        //     referenceAnswer: "Black cat",
+        //     createdAt: "22/12/2025"
+        // }]
 
-    // call api to generate questions for speaking
-    const speakingQuestions = [{
-        lessonPartId: "",
-        type: "speaking",
-        order: 1,
-        prompt: "Describe a cat",
-        referenceAnswer: "Black cat",
-        createdAt: "22/12/2025"
-    }]
+        // call api to generate questions for speaking
+        // const speakingQuestions = [{
+        //     lessonPartId: "",
+        //     type: "speaking",
+        //     order: 1,
+        //     prompt: "Describe a cat",
+        //     referenceAnswer: "Black cat",
+        //     createdAt: "22/12/2025"
+        // }]
+        return res.status(200).json({
+            info: info.data,
+            quizQuestions: quizQuestions.data
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        });
+    }
 
-
-
-    newCourse.save();
 
 };
+
+module.exports = {
+    createCourse
+}

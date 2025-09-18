@@ -1,20 +1,27 @@
 const express = require("express");
 require("dotenv").config();
-// Phân tích (parse) cookie từ request của client.
-//Khi người dùng gửi request có cookie, middleware này giúp bạn đọc
+const courseRouter = require("./routes/course.route");
 const cookieParser = require("cookie-parser");
 const MongoDB = require("./utils/mongodb.util");
+const cors = require("cors");
 
-MongoDB.connect('url');
+// Kết nối MongoDB
+MongoDB.connect(process.env.MONGODB_URI);
 
 const app = express();
 
-// Cho phép Cross-Origin Resource Sharing
-const cors = require("cors");
-
+// Middleware
 app.use(express.static("client"));
 app.use(cors({ origin: ["http://localhost:3000"] }));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+// Routes
+app.use("/api", courseRouter);
 
+// Lệnh chạy server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running at http://localhost:${PORT}`);
+});
