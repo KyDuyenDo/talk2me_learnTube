@@ -1,8 +1,12 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { CourseCard } from "../components/CourseCard"
+import Search from "../components/SearchField"
+import Button from "../components/Button"
+import type { DropDownItem } from "../components/FilterDropDown"
+import Input from "../components/Input"
+import FilterDropDown from "../components/FilterDropDown"
+import { Pagination } from "../components/Pagination"
 
 export const sampleCourses = [
   {
@@ -169,65 +173,115 @@ export const sampleCourses = [
 
 export function CourseGrid() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 9
   const navigate = useNavigate()
 
   const filteredCourses = sampleCourses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.channel.toLowerCase().includes(searchTerm.toLowerCase())
+      course.channel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.category.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesSearch
   })
 
+
+
+  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage)
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setCurrentPage(1)
+  }
+
+  const getCategories = () => {
+    const map = new Map<string, number>();
+    for (const item of sampleCourses) {
+      if (map.has(item.category)) {
+        map.set(item.category, map.get(item.category)! + 1)
+      } else {
+        map.set(item.category, 1)
+      }
+    }
+    return Array.from(map.entries()).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        active: false,
+        count: value
+      };
+    }) as DropDownItem[];
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-10">
-        <div className="max-w-md">
-          <div className="relative">
-            <svg
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 h-14 text-base border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none"
-            />
-          </div>
+      <div className="mb-8 flex flex-row justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Course Library</h1>
+          <p className="text-muted-foreground">Discover and learn from our comprehensive collection of courses</p>
+        </div>
+        <div>
+          <Button>Create Course</Button>
         </div>
       </div>
 
-      {filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredCourses.map((course) => (
-            <CourseCard
-              onClick={() => {
-                navigate(`/courses/${course.id}`)
-              }}
-              key={course.id}
-              course={course}
-            />
-          ))}
+      <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="relative max-w-md w-full">
+          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" /> */}
+          <Input
+            type="text"
+            placeholder="Search courses, channels, or categories..."
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="pl-10"
+          />
         </div>
+
+        <div className="flex items-center gap-2">
+          <FilterDropDown items={getCategories()} />
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">
+          {filteredCourses.length} course{filteredCourses.length !== 1 ? "s" : ""} found
+          {searchTerm && ` for "${searchTerm}"`}
+        </p>
+      </div>
+
+      {filteredCourses.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedCourses.map((course) => (
+              <CourseCard key={course.id} course={course} onClick={() => {
+                navigate(`/courses/${course.id}`)
+              }} />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredCourses.length}
+          />
+        </>
       ) : (
         <div className="text-center py-16 space-y-4">
-          <p className="text-xl text-gray-500">Not found</p>
-          <button
-            onClick={() => setSearchTerm("")}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            Delete searching
-          </button>
+
+          <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
+            <Search />
+          </div>
+          <div>
+            <p className="text-xl font-medium text-foreground mb-2">No courses found</p>
+            <p className="text-muted-foreground mb-4">Try adjusting your search terms or browse all courses</p>
+            <Button onClick={() => handleSearchChange("")} variant="outline">
+              Clear Search
+            </Button>
+          </div>
         </div>
       )}
     </div>

@@ -1,12 +1,31 @@
-import { useState, type FunctionComponent } from "react"
-import { CheckIcon } from "../../../utils/constant/icon"
+import { useState, type FunctionComponent } from "react";
+import { CheckIcon, ChevronDown, RightIcon } from "../../../utils/constant/icon";
+import ReactMarkdown from "react-markdown";
 
-type LessonPartProps = {}
+type LessonPartProps = {
+  title: string;
+  complete: boolean;
+  minutes: string;
+  task: string;
+  theory: string; // markdown string
+  onClickResult: () => void;
+  onClickAccess: () => void;
+};
 
-const LessonPart: FunctionComponent<LessonPartProps> = () => {
-  const [openDropDown, setOpenDropDown] = useState(false)
+const LessonPart: FunctionComponent<LessonPartProps> = ({
+  title,
+  complete,
+  minutes,
+  task,
+  theory,
+  onClickResult,
+  onClickAccess,
+}) => {
+  const [openDropDown, setOpenDropDown] = useState(false);
+
   return (
     <div className="flex pb-6">
+      {/* Icon */}
       <div className="min-w-24 flex justify-center items-center">
         <div className="p-2.5 bg-green-200 rounded-3xl">
           <div className="bg-green-500 p-0.5 rounded-2xl">
@@ -14,26 +33,52 @@ const LessonPart: FunctionComponent<LessonPartProps> = () => {
           </div>
         </div>
       </div>
-      <div className="min-h-40">
-        <div className="flex flex-col">
-          <div className="px-3 py-4">
-            <span className="text-2xl font-bold text-[#1b1f2e]">1. Episode 1. Find Me a Luxury Home</span>
+
+      {/* Content */}
+      <div className="min-h-40 w-full bg-gray-300 rounded-sm">
+        <div className="flex flex-row justify-between items-center px-3 py-2 mb-2">
+          <div className="flex flex-col">
+            <div className="px-3 py-3">
+              <span className="text-2xl font-bold text-[#1b1f2e]">{title}</span>
+            </div>
+            <div>
+              <span className="px-3 text-xs font-medium">Complete: {complete.toString()}</span>
+              <span className="px-3 ml-10 text-xs font-medium">Minutes: {minutes}</span>
+              <span className="px-3 ml-10 text-xs font-medium">{task} tasks</span>
+            </div>
           </div>
-          <div className="">
-            <span className="px-4 text-xs font-medium">Complete</span>
-            <span className="px-4 ml-10 text-xs font-medium">Minutes</span>
-            <span className="px-4 ml-10 text-xs font-medium">2 tasks</span>
-          </div>
+          <RightIcon />
         </div>
-        <div className="mt-3">
-          <div>
+
+        <div className="h-0.5 bg-gray-400 w-full"></div>
+
+        <div className="px-6 py-2.5">
+          <div className="grid grid-cols-12">
+            {/* Toggle Theory */}
             <button
               onClick={() => setOpenDropDown(!openDropDown)}
-              className=""
+              className="col-span-4 font-[700] text-[#2e68ff] flex flex-row items-center"
             >
-              Theory
+              <span>Theory</span>
+              <span className="ml-1 mt-1">
+                <ChevronDown color="text-[#2e68ff]" />
+              </span>
             </button>
+
+            {!openDropDown && (
+              <button
+                onClick={onClickResult}
+                className="col-span-8 font-[700] text-[#2e68ff] flex flex-row items-center"
+              >
+                <span>Result</span>
+                <span className="ml-1 mt-1">
+                  <RightIcon size="size-4" />
+                </span>
+              </button>
+            )}
           </div>
+
+          {/* Dropdown Content */}
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
               openDropDown
@@ -41,25 +86,14 @@ const LessonPart: FunctionComponent<LessonPartProps> = () => {
                 : "max-h-0 opacity-0 transform -translate-y-2"
             }`}
           >
-            <div className="pt-4 pb-2">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">Theory Content</h3>
-                <p className="text-gray-600 text-sm">
-                  This is the theory section content. It contains important information about the lesson that students
-                  need to understand.
-                </p>
-                <ul className="mt-3 space-y-1 text-sm text-gray-600">
-                  <li>• Key concept 1</li>
-                  <li>• Key concept 2</li>
-                  <li>• Key concept 3</li>
-                </ul>
-              </div>
+            <div className="mt-3 prose prose-sm prose-gray prose-h3:text-base prose-p:text-sm prose-li:text-sm">
+              <ReactMarkdown>{theory}</ReactMarkdown>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LessonPart
+export default LessonPart;

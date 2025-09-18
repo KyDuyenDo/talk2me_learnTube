@@ -49,8 +49,8 @@ export const LeftIcon: React.FC = () => (
 
 );
 
-export const RightIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+export const RightIcon: React.FC<{ size?: string }> = ({ size }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${size ? size : "size-6"} font-bold `}>
         <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
     </svg>
 )
@@ -62,13 +62,13 @@ export const SearchIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/sv
 </svg>
 );
 export const CheckIcon: React.FC<{ size?: string }> = ({ size }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`size-${size ? size : "5"} font-bold text-white`}>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${size ? size : "size-5"} font-bold text-white`}>
         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
     </svg>
 )
 
-export const ChevronDown = () => (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+export const ChevronDown: React.FC<{ color?: string }> = ({ color }) => (
+    <svg className={`h-4 w-4 ${color ? color : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
 )

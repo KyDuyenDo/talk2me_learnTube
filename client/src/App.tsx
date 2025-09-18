@@ -5,7 +5,7 @@ import MainLayout from './routes/mainLayout';
 import HomePage from './features/home/pages/Home';
 import QuizResults from './features/report/pages/Report';
 import DetailCourses from './features/courses/pages/DetailCourse';
-import { CourseGridWithPagination } from './features/courses/components/CourseGridWithPagination';
+import { CourseGrid } from './features/courses/pages/Courses';
 function App() {
 
   return (
@@ -15,7 +15,7 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/courses" element={<CourseGridWithPagination />} />
+          <Route path="/courses" element={<CourseGrid />} />
           <Route path="/report" element={<QuizResults />} />
         </Route>
          <Route path="/courses/:id" element={<DetailCourses />} />

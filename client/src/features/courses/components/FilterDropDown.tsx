@@ -80,7 +80,7 @@ const FilterDropDown: FunctionComponent<UserProfileProps> = ({ items }) => {
                                                     />
                                                     {isChecked && (
                                                         <div className="absolute top-[1px] right-[1px] w-4.5 h-4.5 bg-transparent pointer-events-none">
-                                                            <CheckIcon size={"4"} />
+                                                            <CheckIcon size={"size-4"} />
                                                         </div>
                                                     )}
                                                 </div>
