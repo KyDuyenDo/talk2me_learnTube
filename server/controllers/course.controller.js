@@ -6,7 +6,7 @@ const Question = require("../models/question");
 
 const createCourse = async (req, res, next) => {
     const { youtubeUrl, categoryId } = req.body;
-    
+
     try {
         const info = await axios.post(
             "http://127.0.0.1:5000/api/generate/info",
@@ -22,19 +22,20 @@ const createCourse = async (req, res, next) => {
         const newCourse = Course({
             categoryId,
             youtubeUrl,
-            ...info,
+            thumbnail: info.data.thumbnail,
+            title: info.data.title,
             createdAt: Date.now(),
         })
 
-        // newCourse.save()
+        await newCourse.save()
 
-        // const lessonPart = new LessonPart({
-        //   courseId: newCourse._id, 
-        //   type: "quiz",
-        //   completed: false,
-        // });
+        const lessonPart = new LessonPart({
+            courseId: newCourse._id,
+            type: "quiz",
+            completed: false,
+        });
 
-        // lessonPart.save();
+        await lessonPart.save();
 
         // call api to generate questions for quiz
         const quizQuestions = await axios.post(
@@ -48,13 +49,13 @@ const createCourse = async (req, res, next) => {
             }
         );
 
-        // quizQuestions.array.forEach(element => {
-        //     const quiz = Question({
-        //         lessonPartId: lessonPart._id,
-        //         ...element,
-        //     })
-        //     // quiz.save()
-        // });
+        quizQuestions.data.questions.forEach(element => {
+            const quiz = Question({
+                ...element,
+                lessonPartId: lessonPart._id,
+            })
+            quiz.save()
+        });
 
 
         // cal api to generate questions for writing
@@ -85,8 +86,6 @@ const createCourse = async (req, res, next) => {
             error
         });
     }
-
-
 };
 
 module.exports = {

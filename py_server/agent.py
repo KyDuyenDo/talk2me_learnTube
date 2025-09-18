@@ -115,7 +115,6 @@ class QuestionGenerator:
                 "choices": q.options,
                 "correctIndex": ord(q.correct_answer) - ord("A"),
                 "referenceAnswer": q.explanation,
-                "createdAt": datetime.now().strftime("%d/%m/%Y")
             })
         return quiz_questions
 
@@ -128,7 +127,6 @@ class QuestionGenerator:
                 "order": i,
                 "prompt": q.prompt,
                 "referenceAnswer": q.referenceAnswer,
-                "createdAt": datetime.now().strftime("%d/%m/%Y")
             })
         return node_questions
 
