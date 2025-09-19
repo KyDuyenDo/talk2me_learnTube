@@ -7,7 +7,7 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
-import { register } from "../../../api/auth/auth.service";
+import { registerUser } from "../../../api/auth/auth.service";
 
 
 const RegisterPage: FunctionComponent = () => {
@@ -85,7 +85,7 @@ const RegisterPage: FunctionComponent = () => {
             general: !emailError && !passwordError && !email ? "Couldn't find your account." : undefined,
         })
 
-        register(formData).then((res: any) => {
+        registerUser(formData).then((res: any) => {
             if (res.error) {
                 setErrors((prev) => ({ ...prev, general: res.error }))
             } else {

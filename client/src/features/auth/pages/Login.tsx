@@ -1,5 +1,4 @@
 import type React from "react"
-
 import { useState, type FunctionComponent } from "react"
 import rocket from "../../../assets/rocket.png"
 import google from "../../../assets/google.svg"
@@ -7,9 +6,13 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
+import { useAuth } from "../../../context/AuthContext";
+import { useContext } from "react";
+
 
 
 const LoginPage: FunctionComponent = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
@@ -67,6 +70,10 @@ const LoginPage: FunctionComponent = () => {
       password: passwordError || undefined,
       general: !emailError && !passwordError && !email ? "Couldn't find your account." : undefined,
     })
+    const formData = new FormData()
+    formData.append("email", email)
+    formData.append("password", password)
+    login(formData)
   }
 
   return (
