@@ -3,6 +3,9 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const http = require("http");
+const fileUpload = require("express-fileupload");
+const helmet = require("helmet");
+
 
 // MongoDB
 const MongoDB = require("./utils/mongodb.util");
@@ -23,12 +26,16 @@ require("./workers/question.worker");
 const app = express();
 
 // Middleware
-app.use(express.static("client"));
-app.use(cors({ origin: ["http://localhost:3000"], credentials: true }));
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use(fileUpload());
+app.use(express.static("client"));
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
+app.use(helmet());
 // Routes
 app.use("/api/course", courseRouter);
 app.use("/api/user", authRouter);
