@@ -32,7 +32,7 @@ app.use(cookieParser());
 app.use(fileUpload());
 app.use(express.static("client"));
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:3000",
   credentials: true
 }));
 app.use(helmet());
