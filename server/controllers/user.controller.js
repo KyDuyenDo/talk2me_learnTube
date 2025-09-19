@@ -82,6 +82,7 @@ const refresh = async (req, res, next) => {
 const createUser = async (req, res, next) => {
     try {
         const { email, password, name } = req.body;
+        
         const existedUser = await User.findOne({ email });
         if (existedUser) {
             return res.status(409).json({
@@ -96,15 +97,18 @@ const createUser = async (req, res, next) => {
             createdAt: new Date().toLocaleString(),
         });
 
-        newUser.save();
+        await newUser.save();
 
         return res.status(200).json({
             message: "User created successfully"
         })
+
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+
 
 module.exports = {
     signIn,

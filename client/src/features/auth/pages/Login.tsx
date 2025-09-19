@@ -132,7 +132,9 @@ const LoginPage: FunctionComponent = () => {
         </div>
         <footer className="px-5 pb-10 pt-1.5 w-full">
           Don't have an account?
-          <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]"> Sign Up</a>
+          <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]"
+          href="/register"
+          > Sign Up</a>
         </footer>
       </div>
     </div>
