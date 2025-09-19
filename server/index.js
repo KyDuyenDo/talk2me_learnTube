@@ -1,20 +1,30 @@
 const express = require("express");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const http = require("http");
+
+// MongoDB
+const MongoDB = require("./utils/mongodb.util");
+MongoDB.connect(process.env.MONGODB_URI);
+
+// Routes
 const courseRouter = require("./routes/course.route");
 const authRouter = require("./routes/user.route");
 const categoryRouter = require("./routes/category.route");
-const cookieParser = require("cookie-parser");
-const MongoDB = require("./utils/mongodb.util");
-const cors = require("cors");
 
-// Kết nối MongoDB
-MongoDB.connect(process.env.MONGODB_URI);
+// Socket
+const { initSocket } = require("./socket/course.socket");
+
+// ⚡ Workers (Bull queue)
+require("./workers/course.worker");
+require("./workers/question.worker");
 
 const app = express();
 
 // Middleware
 app.use(express.static("client"));
-app.use(cors({ origin: ["http://localhost:3000"] }));
+app.use(cors({ origin: ["http://localhost:3000"], credentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -22,11 +32,16 @@ app.use(cookieParser());
 // Routes
 app.use("/api/course", courseRouter);
 app.use("/api/user", authRouter);
-app.use("/api/category", categoryRouter)
+app.use("/api/category", categoryRouter);
 
+// Create HTTP server for socket.io
+const server = http.createServer(app);
 
-// Lệnh chạy server
+// Initialize Socket.io
+initSocket(server);
+
+// Start server
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server is running at http://localhost:${PORT}`);
 });
