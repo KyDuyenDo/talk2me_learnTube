@@ -1,3 +1,4 @@
+const { courseQueue, questionQueue } = require("../queue/courseQueue");
 const createCourse = async (req, res, next) => {
   try {
     const courseData = req.body;
@@ -6,11 +7,11 @@ const createCourse = async (req, res, next) => {
     const job = await courseQueue.add("createCourse", {
       courseData,
       socketId,
-    });
+    },);
 
     res.status(202).json({
       message: "Course creation started",
-      jobId: job.id,
+      jobCourse: job.id,
     });
   } catch (err) {
     next(err);
