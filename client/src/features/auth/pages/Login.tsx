@@ -6,13 +6,13 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
-import { useAuth } from "../../../context/AuthContext";
-import { useContext } from "react";
-
+import { useDispatch } from "react-redux"
+import { login } from "../../../redux/auth/actions"
+import type { AppDispatch } from "../../../redux/store"
 
 
 const LoginPage: FunctionComponent = () => {
-  const { login } = useAuth();
+  const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
@@ -73,7 +73,7 @@ const LoginPage: FunctionComponent = () => {
     const formData = new FormData()
     formData.append("email", email)
     formData.append("password", password)
-    login(formData)
+    dispatch(login(formData))
   }
 
   return (
