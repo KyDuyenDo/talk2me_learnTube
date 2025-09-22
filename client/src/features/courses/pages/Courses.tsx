@@ -6,7 +6,7 @@ import Button from "../components/Button"
 import type { DropDownItem } from "../components/FilterDropDown"
 import Input from "../components/Input"
 import FilterDropDown from "../components/FilterDropDown"
-import { Pagination } from "../components/Pagination"
+import { Pagination } from "../../../components/Pagination"
 
 export const sampleCourses = [
   {
