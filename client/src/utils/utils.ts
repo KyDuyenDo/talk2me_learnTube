@@ -1,31 +1,35 @@
-import axios from 'axios'
+// api/axiosClient.ts
+import axios from "axios";
 
 const baseURL = 'http://localhost:8000';
 
-const authInterceptor = (req:any) => {
-    const token = JSON.parse(localStorage.getItem('profile') || "")?.accessToken;
+// interceptor cho request → gắn token
+const authInterceptor = (req: any) => {
+    const token = localStorage.getItem("accessToken"); // hoặc lấy từ Zustand nếu muốn
     if (token) {
-        req.headers['Authorization'] = `Bearer ${token}`;
+        req.headers = {
+            ...req.headers,
+            Authorization: `Bearer ${token}`,
+        };
     }
     return req;
-}
+};
 
+// khởi tạo axios instance
 export const api = axios.create({
     baseURL,
     withCredentials: true,
     headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-    }
-})
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+    },
+});
 
-api.interceptors.response.use(authInterceptor)
+// request interceptor (✅ đúng chỗ)
+api.interceptors.request.use(authInterceptor);
 
-export const handleApiError = async (error: any) => {
-    try {
-        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
-        const data = null;
-        return { error: errorMessage, data };
-    } catch (err) {
-        throw new Error("An unexpected error occurred.");
-    }
+// error handler helper
+export const handleApiError = (error: any) => {
+    const errorMessage =
+        (error.response?.data as any)?.message || "An unexpected error occurred.";
+    return { error: errorMessage, data: null };
 };

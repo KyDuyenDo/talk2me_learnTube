@@ -6,13 +6,11 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
-import { useDispatch } from "react-redux"
-import { login } from "../../../redux/auth/actions"
-import type { AppDispatch } from "../../../redux/store"
+import { useLogin } from "../../../hooks/useAuth"
 
 
 const LoginPage: FunctionComponent = () => {
-  const dispatch = useDispatch<AppDispatch>()
+  const loginMutation = useLogin()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
@@ -73,7 +71,17 @@ const LoginPage: FunctionComponent = () => {
     const formData = new FormData()
     formData.append("email", email)
     formData.append("password", password)
-    dispatch(login(formData))
+
+    loginMutation.mutate(formData, {
+      onSuccess: (data) => {
+        if (data.error) return;
+        window.location.href = "/"
+      },
+      onError: (error) => {
+        console.log(error)
+        return error.message;
+      }
+    })
   }
 
   return (
