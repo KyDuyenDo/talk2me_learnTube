@@ -41,8 +41,8 @@ const Button = ({
     "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
   const variantClasses =
     variant === "outline"
-      ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-      : "bg-primary text-primary-foreground hover:bg-primary/90"
+      ? "border-2 border-gray-300 bg-background hover:bg-gray-50 hover:border-gray-400"
+      : "bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-transparent"
   const sizeClasses = size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 py-2"
 
   return (
@@ -90,10 +90,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsPerPage
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
-      <div className="text-sm text-muted-foreground">
-        Showing {startItem} to {endItem} of {totalItems} courses
-      </div>
-
+      <div></div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"

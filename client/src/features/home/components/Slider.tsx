@@ -18,7 +18,7 @@ export function Slider({ children, title, onClickViewAll, lengthView }: SliderPr
   useEffect(() => {
     const updateItemsPerView = () => {
       if (window.innerWidth >= 1280) {
-        setItemsPerView(4) 
+        setItemsPerView(4)
       } else if (window.innerWidth >= 1024) {
         setItemsPerView(3)
       } else if (window.innerWidth >= 768) {

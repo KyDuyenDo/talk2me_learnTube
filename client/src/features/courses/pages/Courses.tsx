@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { CourseCard } from "../components/CourseCard"
-import Search from "../components/SearchField"
 import Button from "../components/Button"
 import type { DropDownItem } from "../components/FilterDropDown"
 import Input from "../components/Input"
 import FilterDropDown from "../components/FilterDropDown"
 import { Pagination } from "../../../components/Pagination"
+import { Search } from "../../../components/SearchField"
 
 export const sampleCourses = [
   {
@@ -218,37 +218,16 @@ export function CourseGrid() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-8 flex flex-row justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Course Library</h1>
-          <p className="text-muted-foreground">Discover and learn from our comprehensive collection of courses</p>
-        </div>
-        <div>
-          <Button>Create Course</Button>
-        </div>
       </div>
 
-      <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <div className="mb-14 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative max-w-md w-full">
-          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" /> */}
-          <Input
-            type="text"
-            placeholder="Search courses, channels, or categories..."
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10"
-          />
+          <Search placeholder="Large size" onChange={(e) => handleSearchChange(e.target.value)} className="h-12 text-lg pl-12" />
         </div>
 
         <div className="flex items-center gap-2">
           <FilterDropDown items={getCategories()} />
         </div>
-      </div>
-
-      <div className="mb-6">
-        <p className="text-sm text-muted-foreground">
-          {filteredCourses.length} course{filteredCourses.length !== 1 ? "s" : ""} found
-          {searchTerm && ` for "${searchTerm}"`}
-        </p>
       </div>
 
       {filteredCourses.length > 0 ? (
@@ -271,10 +250,6 @@ export function CourseGrid() {
         </>
       ) : (
         <div className="text-center py-16 space-y-4">
-
-          <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
-            <Search />
-          </div>
           <div>
             <p className="text-xl font-medium text-foreground mb-2">No courses found</p>
             <p className="text-muted-foreground mb-4">Try adjusting your search terms or browse all courses</p>

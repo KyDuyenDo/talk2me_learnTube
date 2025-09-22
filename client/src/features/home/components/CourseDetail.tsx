@@ -13,7 +13,7 @@ const CourseDetail: FunctionComponent<CourseDetailProps> = (props) => {
                     <img width={120} height={120} src="https://storage.googleapis.com/smalltalk2/assets/tvshow_s.png" />
                 </div>
                 <div className="content mt-7">
-                    <span className="slide-title text-[#1b1f2e] text-[16px] font-[700]">
+                    <span className="slide-title text-[#1b1f2e] text-[16px] font-[700] line-clamp-2 overflow-hidden">
                         {props.title}
                     </span>
                 </div>

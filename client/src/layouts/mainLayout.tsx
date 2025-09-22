@@ -5,7 +5,9 @@ function MainLayout() {
   return (
     <div className="flex flex-row bg-[#f7f7fd]">
       <Navbar />
-      <Outlet />
+      <div className="flex-1 overflow-auto h-screen">
+        <Outlet />
+      </div>
     </div>
   );
 }
