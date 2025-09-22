@@ -3,9 +3,9 @@ import { Outlet } from "react-router-dom";
 
 function MainLayout() {
   return (
-    <div>
+    <div className="flex flex-row bg-[#f7f7fd]">
       <Navbar />
-      <Outlet /> {/* chỗ để render các route con */}
+      <Outlet />
     </div>
   );
 }
