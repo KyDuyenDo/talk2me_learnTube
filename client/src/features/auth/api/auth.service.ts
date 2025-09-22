@@ -1,4 +1,4 @@
-import { api, handleApiError } from "../../utils/utils";
+import { api, handleApiError } from "../../../api/utils";
 
 
 export async function login(formData: FormData) {

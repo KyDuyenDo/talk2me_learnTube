@@ -7,7 +7,7 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
-import { register } from "../../../api/auth/auth.service";
+import { register } from "../api/auth.service";
 
 
 const RegisterPage: FunctionComponent = () => {
