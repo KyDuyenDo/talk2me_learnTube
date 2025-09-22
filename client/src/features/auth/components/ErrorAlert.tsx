@@ -1,15 +1,15 @@
-import type { FunctionComponent } from "react";
+import type { FunctionComponent } from "react"
 
 interface ErrorAlertProps {
-    text: string
+  text: string
 }
 
 const ErrorAlert: FunctionComponent<ErrorAlertProps> = (props) => {
-    return (
-        <div className="border-2 border-[#ff0000] py-2 px-9 text-[16px] my-[10px] leading-6 rounded-md text-center">
-            {props.text}
-        </div>
-    );
+  return (
+    <div className="border-[var(--border-width-normal)] border-[var(--color-error)] py-2 px-9 text-[var(--font-size-base)] my-[10px] leading-6 rounded-[var(--border-radius-md)] text-center bg-red-50 text-[var(--color-error)]">
+      {props.text}
+    </div>
+  )
 }
 
-export default ErrorAlert;
+export default ErrorAlert

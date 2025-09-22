@@ -35,7 +35,7 @@ const Navbar: FunctionComponent = () => {
     );
 };
 
-const NavItem: FunctionComponent<{ title: String, icon?: SVGSVGElement, link: String, active: boolean }> = ({ title, icon, link, active }) => {
+const NavItem: FunctionComponent<{ title: string, link: string, active: boolean }> = ({ title, link, active }) => {
     return <div className="rounded-lg overflow-hidden">
         <div className={`max-w-[12.5rem] flex rounded-lg hover:bg-gray-100 ${active ? '!bg-gray-100' : ''}`}>
             <NavLink to={link as To} className="w-full m-0 overflow-hidden rounded-lg appearance-none bg-transparent border-none cursor-pointer">

@@ -1,264 +1,185 @@
-import { useState } from "react"
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { CourseCard } from "../components/CourseCard"
-import Button from "../components/Button"
-import type { DropDownItem } from "../components/FilterDropDown"
-import Input from "../components/Input"
-import FilterDropDown from "../components/FilterDropDown"
-import { Pagination } from "../../../components/Pagination"
-import { Search } from "../../../components/SearchField"
+import { useCourses, useCategories } from "../../../hooks/useCoursesApi"
+import { useCourseStore } from "../../../store/courseStore"
 
-export const sampleCourses = [
-  {
-    id: "1",
-    title: "Learn Git – Full Course for Beginners",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/zTjRZNkhiEU/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=zTjRZNkhiEU",
-    category: "Development Tools",
-  },
-  {
-    id: "2",
-    title: "Fastest Way to Learn AWS for Complete Beginners (2025)",
-    channel: "Tech With Soleyman",
-    thumbnail: "https://img.youtube.com/vi/gB00e15sUqc/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=gB00e15sUqc",
-    category: "Cloud Computing",
-  },
-  {
-    id: "3",
-    title: "GitHub for AI Engineers (beginner-friendly guide)",
-    channel: "The Data Entrepreneurs",
-    thumbnail: "https://img.youtube.com/vi/enBm0jLXLZ4/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=enBm0jLXLZ4",
-    category: "Development Tools",
-  },
-  {
-    id: "4",
-    title: "Build and Deploy FullStack React App on AWS",
-    channel: "Unspecified Channel (YouTube)",
-    thumbnail: "https://img.youtube.com/vi/FHn8c4Rk_yo/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=FHn8c4Rk_yo",
-    category: "Web Development",
-  },
-  {
-    id: "5",
-    title: "Node JS Full Course 2024 | Complete Backend Development Course",
-    channel: "Unspecified Channel (YouTube)",
-    thumbnail: "https://img.youtube.com/vi/MIJt9H69QVc/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=MIJt9H69QVc",
-    category: "Web Development",
-  },
-  {
-    id: "6",
-    title: "Python Full Course for Beginners",
-    channel: "Programming with Mosh",
-    thumbnail: "https://img.youtube.com/vi/_uQrJ0TkZlc/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=_uQrJ0TkZlc",
-    category: "Programming Languages",
-  },
-  {
-    id: "7",
-    title: "Machine Learning Full Course - Learn Machine Learning",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/7eh4d6sabA0/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=7eh4d6sabA0",
-    category: "AI & Machine Learning",
-  },
-  {
-    id: "8",
-    title: "Docker Crash Course for Absolute Beginners",
-    channel: "TechWorld with Nana",
-    thumbnail: "https://img.youtube.com/vi/pg19Z8LL06w/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=pg19Z8LL06w",
-    category: "DevOps",
-  },
-  {
-    id: "9",
-    title: "Kubernetes Explained in 15 Minutes",
-    channel: "TechWorld with Nana",
-    thumbnail: "https://img.youtube.com/vi/X48VuDVv0do/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=X48VuDVv0do",
-    category: "DevOps",
-  },
-  {
-    id: "10",
-    title: "React JS Full Course for Beginners | 2025",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/bMknfKXIFA8/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=bMknfKXIFA8",
-    category: "Web Development",
-  },
-  {
-    id: "11",
-    title: "Learn TypeScript – Full Course for Beginners",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/30LWjhZzg50/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=30LWjhZzg50",
-    category: "Programming Languages",
-  },
-  {
-    id: "12",
-    title: "C++ Programming Course - Beginner to Advanced",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/vLnPwxZdW4Y/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=vLnPwxZdW4Y",
-    category: "Programming Languages",
-  },
-  {
-    id: "13",
-    title: "SQL Full Course - Learn SQL in 8 Hours",
-    channel: "Programming with Mosh",
-    thumbnail: "https://img.youtube.com/vi/HXV3zeQKqGY/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=HXV3zeQKqGY",
-    category: "Database",
-  },
-  {
-    id: "14",
-    title: "Introduction to Artificial Intelligence (AI)",
-    channel: "Simplilearn",
-    thumbnail: "https://img.youtube.com/vi/JMUxmLyrhSk/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=JMUxmLyrhSk",
-    category: "AI & Machine Learning",
-  },
-  {
-    id: "15",
-    title: "Java Full Course for Beginners",
-    channel: "Bro Code",
-    thumbnail: "https://img.youtube.com/vi/A74TOX803D0/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=A74TOX803D0",
-    category: "Programming Languages",
-  },
-  {
-    id: "16",
-    title: "HTML & CSS Full Course - Beginner to Pro",
-    channel: "SuperSimpleDev",
-    thumbnail: "https://img.youtube.com/vi/G3e-cpL7ofc/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=G3e-cpL7ofc",
-    category: "Web Development",
-  },
-  {
-    id: "17",
-    title: "Rust Programming Language Crash Course",
-    channel: "Traversy Media",
-    thumbnail: "https://img.youtube.com/vi/zF34dRivLOw/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=zF34dRivLOw",
-    category: "Programming Languages",
-  },
-  {
-    id: "18",
-    title: "Next.js Full Course for Beginners",
-    channel: "freeCodeCamp.org",
-    thumbnail: "https://img.youtube.com/vi/1WmNXEVia8I/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=1WmNXEVia8I",
-    category: "Web Development",
-  },
-  {
-    id: "19",
-    title: "React Native Full Course 2025",
-    channel: "Programming with Mosh",
-    thumbnail: "https://img.youtube.com/vi/0-S5a0eXPoc/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=0-S5a0eXPoc",
-    category: "Mobile Development",
-  },
-  {
-    id: "20",
-    title: "DevOps Full Course - Learn DevOps in 8 Hours",
-    channel: "Edureka",
-    thumbnail: "https://img.youtube.com/vi/j5Zsa_eOXeY/maxresdefault.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=j5Zsa_eOXeY",
-    category: "DevOps",
-  },
-]
+import { CourseSearch } from "../components/CourseSearch"
+import { CategoryFilter } from "../components/CategoryFilter"
+import { CourseSortDropdown, type SortOption } from "../components/CourseSortDropdown"
+import { CourseStats } from "../components/CourseStats"
+import { CreateCourseModal } from "../components/CreateCourseModal"
+import { CreateCourseButton } from "../components/CreateCourseButton"
+import type { Category, Course } from "../../../store/courseStore"
+import CourseGrid from "../components/CourseGrid"
 
-export function CourseGrid() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 9
+export function Courses() {
   const navigate = useNavigate()
-
-  const filteredCourses = sampleCourses.filter((course) => {
-    const matchesSearch =
-      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.channel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [sortOption, setSortOption] = useState<SortOption>({
+    value: "newest",
+    label: "Newest First",
+    field: "createdAt",
+    order: "desc",
   })
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
+  // Mock user ID - in real app this would come from auth context
+  const userId = "user-123"
 
+  // API hooks
+  const {
+    data: courses = [],
+    isLoading: coursesLoading,
+    error: coursesError,
+    refetch: refetchCourses,
+  } = useCourses(userId) as { data: Course[]; isLoading: boolean; error: any; refetch: () => void }
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId) as { data: Category[]; isLoading: boolean }
 
-  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage)
+  // Store actions
+  const { removeCourse, updateCourse } = useCourseStore()
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
-    setCurrentPage(1)
+  // Filter and sort courses
+  const filteredAndSortedCourses = useMemo(() => {
+    let filtered = courses as Course[]
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (course) =>
+          course.title.toLowerCase().includes(query) ||
+          course.channel.toLowerCase().includes(query) ||
+          course.description?.toLowerCase().includes(query),
+      )
+    }
+
+    // Apply category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((course) => selectedCategories.includes(course.categoryId))
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      const { field, order } = sortOption
+
+      let aValue: any = a[field]
+      let bValue: any = b[field]
+
+      // Handle different field types
+      if (field === "createdAt") {
+        aValue = new Date(aValue || 0).getTime()
+        bValue = new Date(bValue || 0).getTime()
+      } else if (field === "progress") {
+        aValue = aValue || 0
+        bValue = bValue || 0
+      } else if (field === "title") {
+        aValue = aValue?.toLowerCase() || ""
+        bValue = bValue?.toLowerCase() || ""
+      }
+
+      if (order === "asc") {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+
+    return sorted
+  }, [courses, searchQuery, selectedCategories, sortOption])
+
+  // Event handlers
+  const handleCourseClick = (course: Course) => {
+    navigate(`/courses/${course.id}`)
   }
 
-  const getCategories = () => {
-    const map = new Map<string, number>();
-    for (const item of sampleCourses) {
-      if (map.has(item.category)) {
-        map.set(item.category, map.get(item.category)! + 1)
-      } else {
-        map.set(item.category, 1)
+  const handleCourseEdit = (course: Course) => {
+    // Navigate to edit page or open edit modal
+    navigate(`/courses/${course.id}/edit`)
+  }
+
+  const handleCourseDelete = async (course: Course) => {
+    if (window.confirm(`Are you sure you want to delete "${course.title}"?`)) {
+      try {
+        await removeCourse(course.id)
+        refetchCourses()
+      } catch (error) {
+        console.error("Failed to delete course:", error)
       }
     }
-    return Array.from(map.entries()).map(([key, value]) => {
-      return {
-        label: key,
-        value: key,
-        active: false,
-        count: value
-      };
-    }) as DropDownItem[];
   }
+
+  const handleCreateCategory = () => {
+    // This will be handled by the CreateCourseModal
+    setShowCreateModal(true)
+  }
+
+  const isLoading = coursesLoading || categoriesLoading
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8 flex flex-row justify-between">
-      </div>
-
-      <div className="mb-14 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative max-w-md w-full">
-          <Search placeholder="Large size" onChange={(e) => handleSearchChange(e.target.value)} className="h-12 text-lg pl-12" />
+      {/* Header Section */}
+      <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div>
+          <h1 className="text-[var(--font-size-3xl)] font-bold text-[var(--color-text-primary)] mb-2">My Courses</h1>
+          <p className="text-[var(--color-text-secondary)]">Manage and track your learning progress</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <FilterDropDown items={getCategories()} />
-        </div>
+        <CreateCourseButton onClick={() => setShowCreateModal(true)} disabled={isLoading} />
       </div>
 
-      {filteredCourses.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedCourses.map((course) => (
-              <CourseCard key={course.id} course={course} onClick={() => {
-                navigate(`/courses/${course.id}`)
-              }} />
-            ))}
-          </div>
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            itemsPerPage={itemsPerPage}
-            totalItems={filteredCourses.length}
-          />
-        </>
-      ) : (
-        <div className="text-center py-16 space-y-4">
-          <div>
-            <p className="text-xl font-medium text-foreground mb-2">No courses found</p>
-            <p className="text-muted-foreground mb-4">Try adjusting your search terms or browse all courses</p>
-            <Button onClick={() => handleSearchChange("")} variant="outline">
-              Clear Search
-            </Button>
-          </div>
+      {/* Stats Section */}
+      {!isLoading && courses.length > 0 && (
+        <div className="mb-8">
+          <CourseStats courses={courses as Course[]} categories={categories as Category[]} />
         </div>
       )}
+
+      {/* Filters and Search Section */}
+      <div className="mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
+          <div className="w-full sm:max-w-md">
+            <CourseSearch onSearch={setSearchQuery} placeholder="Search courses..." initialValue={searchQuery} />
+          </div>
+
+          <CategoryFilter
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onCategoryChange={setSelectedCategories}
+            onCreateCategory={handleCreateCategory}
+            isLoading={categoriesLoading}
+          />
+        </div>
+
+        <CourseSortDropdown selectedSort={sortOption} onSortChange={setSortOption} />
+      </div>
+
+      {/* Course Grid */}
+      <CourseGrid
+        courses={filteredAndSortedCourses}
+        isLoading={isLoading}
+        error={coursesError?.message || null}
+        onCourseClick={handleCourseClick}
+        onCourseEdit={handleCourseEdit}
+        onCourseDelete={handleCourseDelete}
+        showActions={true}
+        emptyMessage={
+          searchQuery || selectedCategories.length > 0
+            ? "No courses match your filters"
+            : "No courses found. Create your first course to get started!"
+        }
+        onRetry={refetchCourses}
+      />
+
+      {/* Create Course Modal */}
+      <CreateCourseModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        categories={categories}
+        userId={userId}
+      />
     </div>
   )
 }

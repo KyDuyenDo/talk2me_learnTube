@@ -1,4 +1,3 @@
-
 interface QuizResult {
   id: number
   question: string

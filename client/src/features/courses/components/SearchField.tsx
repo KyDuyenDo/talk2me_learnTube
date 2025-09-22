@@ -1,5 +1,3 @@
-"use client"
-
 import type * as React from "react"
 
 interface SearchProps extends React.ComponentProps<"input"> {

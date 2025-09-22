@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const baseURL = 'http://localhost:8000';
 
-const authInterceptor = (req:any) => {
+const authInterceptor = (req: any) => {
     const token = JSON.parse(localStorage.getItem('profile') || "")?.accessToken;
     if (token) {
         req.headers['Authorization'] = `Bearer ${token}`;

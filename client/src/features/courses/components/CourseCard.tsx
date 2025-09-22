@@ -1,32 +1,115 @@
-interface Course {
-  id: string
-  title: string
-  channel: string
-  thumbnail: string
-  videoUrl: string
-}
+import type { FunctionComponent } from "react"
+import type { Course } from "../../../store/courseStore"
+// import { PlayIcon, ClockIcon, CheckCircleIcon } from "../../../utils/constant/icon"
 
 interface CourseCardProps {
-  course: Course,
+  course: Course
   onClick?: () => void
+  onEdit?: () => void
+  onDelete?: () => void
+  showActions?: boolean
 }
 
-export function CourseCard({ course, onClick }: CourseCardProps) {
+export const CourseCard: FunctionComponent<CourseCardProps> = ({
+  course,
+  onClick,
+  onEdit,
+  onDelete,
+  showActions = false,
+}) => {
+  const progressPercentage = course.progress || 0
+  const isCompleted = course.isCompleted || progressPercentage >= 100
+
   return (
-    <a onClick={onClick} className="cursor-pointer bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+    <div className="bg-[var(--color-background)] rounded-[var(--border-radius-lg)] border-[var(--border-width-normal)] border-[var(--color-border)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-200 overflow-hidden group">
       <div className="flex flex-col">
+        {/* Thumbnail Section */}
         <div className="p-3 pb-0">
-          <div className="relative aspect-video overflow-hidden rounded-lg">
-            <img src={course.thumbnail || "/placeholder.svg"} alt={course.title} className="object-cover" />
-            <div className="absolute inset-0 bg-black/30" />
+          <div className="relative aspect-video overflow-hidden rounded-[var(--border-radius-md)]">
+            <img
+              src={course.thumbnail || "/placeholder.svg?height=180&width=320&query=video thumbnail"}
+              alt={course.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+
+            {/* Play Button Overlay */}
+            <button
+              onClick={onClick}
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/40"
+            >
+              <div className="bg-[var(--color-primary)] rounded-full p-3 shadow-lg">
+                {/* <PlayIcon className="w-6 h-6 text-white ml-1" /> */}
+                <div className="w-6 h-6 text-white ml-1">▶</div>
+              </div>
+            </button>
+
+            {/* Progress Bar */}
+            {progressPercentage > 0 && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+                <div
+                  className="h-full bg-[var(--color-primary)] transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+            )}
+
+            {/* Completion Badge */}
+            {isCompleted && (
+              <div className="absolute top-2 right-2">
+                <div className="bg-[var(--color-success)] rounded-full p-1">
+                  {/* <CheckCircleIcon className="w-4 h-4 text-white" /> */}
+                  <div className="w-4 h-4 text-white">✓</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="p-3 space-y-2">
-          <h3 className="font-medium text-gray-900 line-clamp-2 leading-snug text-sm">{course.title}</h3>
-          <p className="text-xs text-gray-600 mt-1">{course.channel}</p>
+        {/* Content Section */}
+        <div className="p-3 space-y-2 flex-1">
+          <h3 className="font-medium text-[var(--color-text-primary)] line-clamp-2 leading-snug text-[var(--font-size-sm)]">
+            {course.title}
+          </h3>
+          <p className="text-[var(--font-size-xs)] text-[var(--color-text-secondary)]">{course.channel}</p>
+
+          {/* Progress Info */}
+          <div className="flex items-center justify-between text-[var(--font-size-xs)] text-[var(--color-text-muted)]">
+            <div className="flex items-center gap-1">
+              {/* <ClockIcon className="w-3 h-3" /> */}
+              <div className="w-3 h-3">🕒</div>
+              <span>{isCompleted ? "Completed" : `${progressPercentage}% complete`}</span>
+            </div>
+            {course.createdAt && <span>{new Date(course.createdAt).toLocaleDateString()}</span>}
+          </div>
+
+          {/* Action Buttons */}
+          {showActions && (
+            <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit?.()
+                }}
+                className="flex-1 px-3 py-1 text-[var(--font-size-xs)] font-medium text-[var(--color-primary)] border-[var(--border-width-thin)] border-[var(--color-primary)] rounded-[var(--border-radius-sm)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete?.()
+                }}
+                className="flex-1 px-3 py-1 text-[var(--font-size-xs)] font-medium text-[var(--color-error)] border-[var(--border-width-thin)] border-[var(--color-error)] rounded-[var(--border-radius-sm)] hover:bg-[var(--color-error)] hover:text-white transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
-    </a>
+    </div>
   )
 }
+
+export default CourseCard

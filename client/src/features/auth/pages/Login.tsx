@@ -8,8 +8,6 @@ import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
 
-
-
 const LoginPage: FunctionComponent = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -71,12 +69,14 @@ const LoginPage: FunctionComponent = () => {
   }
 
   return (
-    <div className="h-[100vh] w-[100vw]">
+    <div className="h-[100vh] w-[100vw] bg-[var(--color-background)]">
       <div className="h-[64px]"></div>
       <div className="m-auto max-w-[520px] pt-[10px] items-center text-center">
-        <div className="relative py-[32px] px-[40px] border-2 border-[#e6e6eb] w-full rounded-md">
+        <div className="relative py-[var(--spacing-2xl)] px-[var(--spacing-2xl)] border-[var(--border-width-normal)] border-[var(--color-border)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-background)]">
           <div className="flex header text-left mb-4">
-            <h1 className="leading-[46px] text-[40px] font-[900] max-w-[278px] mb-4">Login</h1>
+            <h1 className="leading-[46px] text-[var(--font-size-4xl)] font-bold max-w-[278px] mb-4 text-[var(--color-text-primary)]">
+              Login
+            </h1>
             <img
               className="absolute top-[22px] right-[20px] w-[176px] -translate-y-[50%]"
               src={rocket || "/placeholder.svg"}
@@ -88,13 +88,15 @@ const LoginPage: FunctionComponent = () => {
             <SocialButton icon={facebook} text="Facebook" />
           </div>
           <div className="divider flex items-center my-3">
-            <hr className="w-[100%] h-[1px] text-gray-300" />
-            <span className="px-[20px] text-[20px] font-[600]">or</span>
-            <hr className="w-[100%] h-[1px] text-gray-300" />
+            <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
+            <span className="px-[var(--spacing-lg)] text-[var(--font-size-lg)] font-semibold text-[var(--color-text-primary)]">
+              or
+            </span>
+            <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
           </div>
           <div className="form text-left">
             <div className="mb-2.5">
-              <label className="text-[#1b1f2e] text-[16px] font-[700]">Email</label>
+              <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">Email</label>
             </div>
             <div className="mb-[10px]">
               <Input error={!!errors.email} value={email} onChange={handleEmailChange} onBlur={handleEmailBlur} />
@@ -102,8 +104,12 @@ const LoginPage: FunctionComponent = () => {
               {errors.email && <ErrorAlert text={errors.email} />}
             </div>
             <div className="flex justify-between">
-              <label className="mb-2.5 text-[#1b1f2e] text-[16px] font-[700]">Password</label>
-              <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]">Forgot password?</a>
+              <label className="mb-2.5 text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
+                Password
+              </label>
+              <a className="hover:cursor-pointer mb-2.5 text-[var(--color-primary)] text-[var(--font-size-base)] font-bold">
+                Forgot password?
+              </a>
             </div>
             <div className="mb-[10px]">
               <Input
@@ -124,18 +130,22 @@ const LoginPage: FunctionComponent = () => {
             <div>
               <button
                 onClick={handleLogin}
-                className="hover:cursor-pointer p-[16px] w-full rounded-md bg-[#1b1f2e] text-amber-50 text-[16px] font-[700] hover:bg-[#8100ff]"
+                className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
               >
                 Login
               </button>
             </div>
           </div>
         </div>
-        <footer className="px-5 pb-10 pt-1.5 w-full">
+        <footer className="px-5 pb-10 pt-1.5 w-full text-[var(--color-text-secondary)]">
           Don't have an account?
-          <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]"
-          href="/register"
-          > Sign Up</a>
+          <a
+            className="hover:cursor-pointer mb-2.5 text-[var(--color-primary)] text-[var(--font-size-base)] font-bold ml-1"
+            href="/register"
+          >
+            {" "}
+            Sign Up
+          </a>
         </footer>
       </div>
     </div>

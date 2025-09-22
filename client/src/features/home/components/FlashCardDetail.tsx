@@ -1,5 +1,3 @@
-"use client"
-
 import type { FunctionComponent } from "react"
 
 interface FlashCardDetailProps {
