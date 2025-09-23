@@ -74,7 +74,6 @@ export const courseApi = {
     categoryId: string;
     userId: string;
   }): Promise<Course> => {
-    // Nếu upload file -> dùng FormData
     const formData = new FormData();
     for (const key in courseData) {
       formData.append(key, (courseData as any)[key]);
@@ -110,7 +109,7 @@ export const courseApi = {
 // Category API
 // ---------------------
 export const categoryApi = {
-  getCategories: async (userId: string): Promise<Category[]> => {
+  getCategories: async (): Promise<Category[]> => {
     const response = await api.get<ApiResponse<Category[]>>(`/api/categories`);
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || "Failed to fetch categories");
@@ -118,7 +117,7 @@ export const categoryApi = {
     return response.data.data;
   },
 
-  createCategory: async (categoryData: { name: string; userId: string }): Promise<Category> => {
+  createCategory: async (categoryData: { name: string; }): Promise<Category> => {
     const response = await api.post<ApiResponse<Category>>("/api/categories", categoryData, {
       headers: { "Content-Type": "application/json" },
     });
