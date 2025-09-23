@@ -1,4 +1,5 @@
-import type { Course, Category } from "../store/courseStore"
+import type { Category, Course } from "../../../store/courseStore"
+
 
 const API_BASE_URL = "http://localhost:3001/api"
 

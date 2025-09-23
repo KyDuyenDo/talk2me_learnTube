@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useCourseStore } from "../store/courseStore"
-import { courseApi, categoryApi, youtubeApi } from "../api/courseApi"
+
 import type { Course } from "../store/courseStore"
+import { categoryApi, courseApi, youtubeApi } from "../features/courses/api/courseApi"
+import { useEffect } from "react"
 
 // Query keys
 export const courseKeys = {
@@ -18,7 +20,7 @@ export const categoryKeys = {
   list: (userId: string) => [...categoryKeys.lists(), userId] as const,
 }
 
-// Course hooks
+// Course hooks GET
 export const useCourses = (
   userId: string,
   params?: {
@@ -30,70 +32,64 @@ export const useCourses = (
     sortOrder?: "asc" | "desc"
   },
 ) => {
-  const { setCourses, setLoading, setError } = useCourseStore()
-
-  return useQuery({
+  const { setCourses } = useCourseStore()
+  const query = useQuery({
     queryKey: courseKeys.list(userId, params),
     queryFn: () => courseApi.getCourses(userId, params),
-    onSuccess: (data) => {
-      setCourses(data.data)
-      setLoading(false)
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
-      setLoading(false)
-    },
-    onLoading: () => setLoading(true),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 5,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setCourses(query.data.data)
+    }
+  }, [query.data, setCourses])
+
+  return query
 }
 
 export const useCourse = (userId: string, courseId: string) => {
-  const { setSelectedCourse, setLoading, setError } = useCourseStore()
+  const { setSelectedCourse } = useCourseStore()
 
-  return useQuery({
+  const query = useQuery({
     queryKey: courseKeys.detail(userId, courseId),
     queryFn: () => courseApi.getCourse(userId, courseId),
     enabled: !!courseId && !!userId,
-    onSuccess: (data) => {
-      setSelectedCourse(data)
-      setLoading(false)
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
-      setLoading(false)
-    },
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setSelectedCourse(query.data)
+    }
+  }, [query.data, setSelectedCourse])
+
+  return
 }
 
 export const useCategories = (userId: string) => {
-  const { setCategories, setLoading, setError } = useCourseStore()
+  const { setCategories } = useCourseStore()
 
-  return useQuery({
+  const query = useQuery({
     queryKey: categoryKeys.list(userId),
     queryFn: () => categoryApi.getCategories(userId),
     enabled: !!userId,
-    onSuccess: (data) => {
-      setCategories(data)
-      setLoading(false)
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
-      setLoading(false)
-    },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 10,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setCategories(query.data)
+    }
+  }, [query.data, setCategories])
+
+  return query
 }
 
-// Mutation hooks
+// Mutation hooks POST
 export const useCreateCourse = () => {
   const queryClient = useQueryClient()
-  const { addCourse, setError, setCreateModalOpen } = useCourseStore()
+  const { addCourse, setCreateModalOpen } = useCourseStore()
 
   return useMutation({
     mutationFn: courseApi.createCourse,
@@ -101,17 +97,13 @@ export const useCreateCourse = () => {
       addCourse(newCourse)
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
       setCreateModalOpen(false)
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
 
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient()
-  const { updateCourse, setError } = useCourseStore()
+  const { updateCourse } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ courseId, updates }: { courseId: string; updates: Partial<Course> }) =>
@@ -119,17 +111,13 @@ export const useUpdateCourse = () => {
     onSuccess: (updatedCourse) => {
       updateCourse(updatedCourse.id, updatedCourse)
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient()
-  const { removeCourse, setError } = useCourseStore()
+  const { removeCourse } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ courseId, userId }: { courseId: string; userId: string }) =>
@@ -137,17 +125,13 @@ export const useDeleteCourse = () => {
     onSuccess: (_, { courseId }) => {
       removeCourse(courseId)
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
 
 export const useUpdateProgress = () => {
   const queryClient = useQueryClient()
-  const { updateCourse, setError } = useCourseStore()
+  const { updateCourse } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ courseId, userId, progress }: { courseId: string; userId: string; progress: number }) =>
@@ -155,10 +139,6 @@ export const useUpdateProgress = () => {
     onSuccess: (updatedCourse) => {
       updateCourse(updatedCourse.id, { progress: updatedCourse.progress, isCompleted: updatedCourse.isCompleted })
       queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse.userId, updatedCourse.id) })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
@@ -166,24 +146,20 @@ export const useUpdateProgress = () => {
 // Category mutation hooks
 export const useCreateCategory = () => {
   const queryClient = useQueryClient()
-  const { addCategory, setError } = useCourseStore()
+  const { addCategory } = useCourseStore()
 
   return useMutation({
     mutationFn: categoryApi.createCategory,
     onSuccess: (newCategory) => {
       addCategory(newCategory)
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
 
 export const useUpdateCategory = () => {
   const queryClient = useQueryClient()
-  const { updateCategory, setError } = useCourseStore()
+  const { updateCategory } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ categoryId, updates }: { categoryId: string; updates: { name: string } }) =>
@@ -191,17 +167,13 @@ export const useUpdateCategory = () => {
     onSuccess: (updatedCategory) => {
       updateCategory(updatedCategory.id, updatedCategory)
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient()
-  const { removeCategory, setError } = useCourseStore()
+  const { removeCategory } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ categoryId, userId }: { categoryId: string; userId: string }) =>
@@ -210,10 +182,6 @@ export const useDeleteCategory = () => {
       removeCategory(categoryId)
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
-      setError(null)
-    },
-    onError: (error: Error) => {
-      setError(error.message)
     },
   })
 }

@@ -1,7 +1,7 @@
 import "./App.css"
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { ThemeProvider } from "./components/ThemeProvider"
+import { ThemeProvider } from "./providers/ThemeProvider"
 import MainLayout from "./layouts/mainLayout"
 import HomePage from "./features/home/pages/Home"
 import QuizResults from "./features/report/pages/Report"

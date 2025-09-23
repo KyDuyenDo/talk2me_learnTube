@@ -31,12 +31,16 @@ export function Courses() {
 
   // API hooks
   const {
-    data: courses = [],
+    data: coursesResponse,
     isLoading: coursesLoading,
     error: coursesError,
     refetch: refetchCourses,
-  } = useCourses(userId) as { data: Course[]; isLoading: boolean; error: any; refetch: () => void }
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId) as { data: Category[]; isLoading: boolean }
+  } = useCourses(userId)
+  
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId)
+
+  // define data
+  const courses = coursesResponse?.data ?? []
 
   // Store actions
   const { removeCourse, updateCourse } = useCourseStore()
