@@ -1,4 +1,5 @@
 import type { Category, Course } from "../../../store/courseStore"
+import { api } from "../../../api/utils"
 
 
 const API_BASE_URL = "http://localhost:3001/api"
@@ -43,13 +44,13 @@ export const courseApi = {
     if (params?.sortBy) searchParams.append("sortBy", params.sortBy)
     if (params?.sortOrder) searchParams.append("sortOrder", params.sortOrder)
 
-    const response = await fetch(`${API_BASE_URL}/courses?${searchParams}`)
+    const response = await api.get(`/api/course?${searchParams}`)
 
-    if (!response.ok) {
+    if (!response.data.ok) {
       throw new Error(`Failed to fetch courses: ${response.statusText}`)
     }
 
-    const result: ApiResponse<PaginatedResponse<Course>> = await response.json()
+    const result: ApiResponse<PaginatedResponse<Course>> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to fetch courses")
@@ -60,16 +61,17 @@ export const courseApi = {
 
   // Get a specific course
   getCourse: async (userId: string, courseId: string): Promise<Course> => {
-    const response = await fetch(`${API_BASE_URL}/courses/${courseId}?userId=${userId}`)
 
-    if (!response.ok) {
+    const response = await api.get(`/api/courses/${courseId}?userId=${userId}`)
+
+    if (!response.data.ok) {
       if (response.status === 404) {
         throw new Error("Course not found")
       }
       throw new Error(`Failed to fetch course: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Course> = await response.json()
+    const result: ApiResponse<Course> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to fetch course")
@@ -86,20 +88,19 @@ export const courseApi = {
     categoryId: string
     userId: string
   }): Promise<Course> => {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      method: "POST",
+
+    const response = await api.post(`/api/courses`, JSON.stringify(courseData), {
       headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(courseData),
+        "Content-Type": "multipart/form-data",
+      }
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to create course: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Course> = await response.json()
+    const result: ApiResponse<Course> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to create course")
@@ -108,42 +109,18 @@ export const courseApi = {
     return result.data
   },
 
-  // Update a course
-  updateCourse: async (courseId: string, updates: Partial<Course>): Promise<Course> => {
-    const response = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.error || `Failed to update course: ${response.statusText}`)
-    }
-
-    const result: ApiResponse<Course> = await response.json()
-
-    if (!result.success || !result.data) {
-      throw new Error(result.error || "Failed to update course")
-    }
-
-    return result.data
-  },
-
   // Delete a course
   deleteCourse: async (courseId: string, userId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/courses/${courseId}?userId=${userId}`, {
-      method: "DELETE",
-    })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+    const response = await api.delete(`/api/courses/${courseId}?userId=${userId}`)
+
+
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to delete course: ${response.statusText}`)
     }
 
-    const result: ApiResponse<null> = await response.json()
+    const result: ApiResponse<null> = await response.data.json()
 
     if (!result.success) {
       throw new Error(result.error || "Failed to delete course")
@@ -152,20 +129,20 @@ export const courseApi = {
 
   // Update course progress
   updateProgress: async (courseId: string, userId: string, progress: number): Promise<Course> => {
-    const response = await fetch(`${API_BASE_URL}/courses/${courseId}/progress`, {
-      method: "PATCH",
+
+    const response = await api.patch(`/api/courses/${courseId}`, JSON.stringify({ userId, progress }), {
       headers: {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, progress }),
+      }
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to update progress: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Course> = await response.json()
+    const result: ApiResponse<Course> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to update progress")
@@ -179,13 +156,13 @@ export const courseApi = {
 export const categoryApi = {
   // Get all categories for a user
   getCategories: async (userId: string): Promise<Category[]> => {
-    const response = await fetch(`${API_BASE_URL}/categories?userId=${userId}`)
+    const response = await api.get(`/api/categories?userId=${userId}`)
 
-    if (!response.ok) {
+    if (!response.data.ok) {
       throw new Error(`Failed to fetch categories: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Category[]> = await response.json()
+    const result: ApiResponse<Category[]> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to fetch categories")
@@ -199,20 +176,21 @@ export const categoryApi = {
     name: string
     userId: string
   }): Promise<Category> => {
-    const response = await fetch(`${API_BASE_URL}/categories`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(categoryData),
-    })
+    const response = await api.post(`/api/categories`,
+      JSON.stringify(categoryData),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to create category: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Category> = await response.json()
+    const result: ApiResponse<Category> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to create category")
@@ -223,7 +201,7 @@ export const categoryApi = {
 
   // Update a category
   updateCategory: async (categoryId: string, updates: { name: string }): Promise<Category> => {
-    const response = await fetch(`${API_BASE_URL}/categories/${categoryId}`, {
+    const response = await api.put(`/api/categories/${categoryId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -231,12 +209,12 @@ export const categoryApi = {
       body: JSON.stringify(updates),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to update category: ${response.statusText}`)
     }
 
-    const result: ApiResponse<Category> = await response.json()
+    const result: ApiResponse<Category> = await response.data.json()
 
     if (!result.success || !result.data) {
       throw new Error(result.error || "Failed to update category")
@@ -247,16 +225,14 @@ export const categoryApi = {
 
   // Delete a category
   deleteCategory: async (categoryId: string, userId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/categories/${categoryId}?userId=${userId}`, {
-      method: "DELETE",
-    })
+    const response = await api.delete(`/api/categories/${categoryId}?userId=${userId}`)
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+    if (!response.data.ok) {
+      const errorData = await response.data.json().catch(() => ({}))
       throw new Error(errorData.error || `Failed to delete category: ${response.statusText}`)
     }
 
-    const result: ApiResponse<null> = await response.json()
+    const result: ApiResponse<null> = await response.data.json()
 
     if (!result.success) {
       throw new Error(result.error || "Failed to delete category")
