@@ -199,30 +199,6 @@ export const categoryApi = {
     return result.data
   },
 
-  // Update a category
-  updateCategory: async (categoryId: string, updates: { name: string }): Promise<Category> => {
-    const response = await api.put(`/api/categories/${categoryId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
-    })
-
-    if (!response.data.ok) {
-      const errorData = await response.data.json().catch(() => ({}))
-      throw new Error(errorData.error || `Failed to update category: ${response.statusText}`)
-    }
-
-    const result: ApiResponse<Category> = await response.data.json()
-
-    if (!result.success || !result.data) {
-      throw new Error(result.error || "Failed to update category")
-    }
-
-    return result.data
-  },
-
   // Delete a category
   deleteCategory: async (categoryId: string, userId: string): Promise<void> => {
     const response = await api.delete(`/api/categories/${categoryId}?userId=${userId}`)

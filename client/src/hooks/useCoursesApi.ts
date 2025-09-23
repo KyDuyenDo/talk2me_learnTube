@@ -101,19 +101,6 @@ export const useCreateCourse = () => {
   })
 }
 
-export const useUpdateCourse = () => {
-  const queryClient = useQueryClient()
-  const { updateCourse } = useCourseStore()
-
-  return useMutation({
-    mutationFn: ({ courseId, updates }: { courseId: string; updates: Partial<Course> }) =>
-      courseApi.updateCourse(courseId, updates),
-    onSuccess: (updatedCourse) => {
-      updateCourse(updatedCourse.id, updatedCourse)
-      queryClient.invalidateQueries({ queryKey: courseKeys.all })
-    },
-  })
-}
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient()
@@ -152,20 +139,6 @@ export const useCreateCategory = () => {
     mutationFn: categoryApi.createCategory,
     onSuccess: (newCategory) => {
       addCategory(newCategory)
-      queryClient.invalidateQueries({ queryKey: categoryKeys.all })
-    },
-  })
-}
-
-export const useUpdateCategory = () => {
-  const queryClient = useQueryClient()
-  const { updateCategory } = useCourseStore()
-
-  return useMutation({
-    mutationFn: ({ categoryId, updates }: { categoryId: string; updates: { name: string } }) =>
-      categoryApi.updateCategory(categoryId, updates),
-    onSuccess: (updatedCategory) => {
-      updateCategory(updatedCategory.id, updatedCategory)
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
     },
   })
