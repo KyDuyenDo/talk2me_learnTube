@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useCourseStore } from "../store/courseStore"
 
-import type { Course } from "../store/courseStore"
 import { categoryApi, courseApi, youtubeApi } from "../features/courses/api/courseApi"
 import { useEffect } from "react"
 
@@ -9,20 +8,19 @@ import { useEffect } from "react"
 export const courseKeys = {
   all: ["courses"] as const,
   lists: () => [...courseKeys.all, "list"] as const,
-  list: (userId: string, filters?: any) => [...courseKeys.lists(), userId, filters] as const,
+  list: (filters?: any) => [...courseKeys.lists(), filters] as const,
   details: () => [...courseKeys.all, "detail"] as const,
-  detail: (userId: string, courseId: string) => [...courseKeys.details(), userId, courseId] as const,
+  detail: (courseId: string) => [...courseKeys.details(), courseId] as const,
 }
 
 export const categoryKeys = {
   all: ["categories"] as const,
   lists: () => [...categoryKeys.all, "list"] as const,
-  list: (userId: string) => [...categoryKeys.lists(), userId] as const,
+  list: () => [...categoryKeys.lists()] as const,
 }
 
 // Course hooks GET
 export const useCourses = (
-  userId: string,
   params?: {
     page?: number
     limit?: number
@@ -34,8 +32,8 @@ export const useCourses = (
 ) => {
   const { setCourses } = useCourseStore()
   const query = useQuery({
-    queryKey: courseKeys.list(userId, params),
-    queryFn: () => courseApi.getCourses(userId, params),
+    queryKey: courseKeys.list(params),
+    queryFn: () => courseApi.getCourses(params),
     staleTime: 1000 * 60 * 5,
   })
 
@@ -48,7 +46,7 @@ export const useCourses = (
   return query
 }
 
-export const useCourse = (userId: string, courseId: string) => {
+export const useCourse = (courseId: string) => {
   const { setSelectedCourse } = useCourseStore()
 
   const query = useQuery({

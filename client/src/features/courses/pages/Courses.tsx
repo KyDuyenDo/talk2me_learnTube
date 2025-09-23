@@ -27,7 +27,6 @@ export function Courses() {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   // Mock user ID - in real app this would come from auth context
-  const userId = "user-123"
 
   // API hooks
   const {
@@ -35,12 +34,14 @@ export function Courses() {
     isLoading: coursesLoading,
     error: coursesError,
     refetch: refetchCourses,
-  } = useCourses(userId)
-  
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId)
+  } = useCourses()
+
+  //const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId)
 
   // define data
   const courses = coursesResponse?.data ?? []
+  const categories: Category[] = []
+  const categoriesLoading = false
 
   // Store actions
   const { removeCourse, updateCourse } = useCourseStore()
@@ -178,12 +179,11 @@ export function Courses() {
       />
 
       {/* Create Course Modal */}
-      <CreateCourseModal
+      {/* <CreateCourseModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         categories={categories}
-        userId={userId}
-      />
+      /> */}
     </div>
   )
 }

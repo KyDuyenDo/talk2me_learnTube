@@ -260,7 +260,7 @@ export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({
           />
           {errors.title && (
             <p className="mt-1 text-[var(--font-size-xs)] text-[var(--color-error)] flex items-center gap-1">
-              <AlertCircleIcon className="w-3 h-3" />
+              {/* <AlertCircleIcon className="w-3 h-3" /> */}
               {errors.title}
             </p>
           )}

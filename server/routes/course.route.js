@@ -1,8 +1,10 @@
 const express = require("express");
-const { createCourse } = require("../controllers/course.controller");
+const authMiddleware = require("../middlewares/auth")
+const { createCourse, getAllCourseByUser } = require("../controllers/course.controller");
 
 const routes = express.Router();
 
-routes.post("/", createCourse);
+routes.post("/", authMiddleware, createCourse);
+routes.get("/", authMiddleware, getAllCourseByUser)
 
 module.exports = routes;
