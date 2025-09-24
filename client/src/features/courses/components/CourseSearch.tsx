@@ -33,9 +33,9 @@ export const CourseSearch: FunctionComponent<CourseSearchProps> = ({
   return (
     <div className="relative">
       <div
-        className={`flex items-center px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] transition-colors ${isFocused
-          ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20"
-          : "border-[var(--color-border)] hover:border-[var(--color-text-secondary)]"
+        className={`flex items-center px-[var(--spacing-md)] py-[var(--spacing-sm)] [border-width:var(--border-width-normal)] [border-color:var(--color-border)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] transition-colors ${isFocused
+          ? "ring-2 ring-[var(--color-primary)] ring-opacity-20"
+          : "hover:border-[var(--color-text-secondary)]"
           }`}
       >
         <SearchIcon className="w-4 h-4 text-[var(--color-text-muted)] mr-3" />
@@ -46,7 +46,7 @@ export const CourseSearch: FunctionComponent<CourseSearchProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="flex-1 outline-none bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-[var(--font-size-sm)]"
+          className="flex-1 outline-none bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-[length:var(--font-size-sm)]"
         />
         {searchQuery && (
           <button

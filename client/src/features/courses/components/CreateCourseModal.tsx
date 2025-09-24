@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type FunctionComponent } from "react"
 import { useForm, Controller } from "react-hook-form"
 import type { Category } from "../../../store/courseStore"
 import type { VideoInfo, FormData } from "../types"
-import { useYouTubeInfo } from "../../../hooks/useCoursesApi"
+import { useYouTubeInfo } from "../hooks/useCoursesApi"
 
 interface CreateCourseModalProps {
   isOpen: boolean

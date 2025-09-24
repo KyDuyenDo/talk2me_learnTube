@@ -85,9 +85,9 @@ export const FolderCard: FunctionComponent<FolderCardProps> = ({ folder, onClick
             <h3 className="font-semibold text-[var(--color-text-primary)] line-clamp-2 leading-tight text-lg mb-2">
               {folder.title}
             </h3>
-            {folder.description && (
+            {/* {folder.description && (
               <p className="text-[var(--color-text-muted)] text-sm line-clamp-2 mb-3">{folder.description}</p>
-            )}
+            )} */}
           </div>
 
           <div className="flex items-center justify-between">

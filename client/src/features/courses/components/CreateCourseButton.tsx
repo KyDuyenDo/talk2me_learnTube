@@ -15,9 +15,9 @@ export const CreateCourseButton: FunctionComponent<CreateCourseButtonProps> = ({
   size = "md",
 }) => {
   const sizeClasses = {
-    sm: "px-3 py-1.5 text-[var(--font-size-xs)]",
-    md: "px-4 py-2 text-[var(--font-size-sm)]",
-    lg: "px-6 py-3 text-[var(--font-size-base)]",
+    sm: "px-3 py-1.5 text-[length:var(--font-size-xs)]",
+    md: "px-4 py-2 text-[length:var(--font-size-sm)]",
+    lg: "px-6 py-3 text-[length:var(--font-size-base)]",
   }
 
   const variantClasses = {

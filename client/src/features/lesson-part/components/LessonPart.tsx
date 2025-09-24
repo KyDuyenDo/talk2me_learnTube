@@ -1,16 +1,16 @@
-import { useState, type FunctionComponent } from "react";
-import { CheckIcon, ChevronDown, RightIcon } from "../../../utils/constant/icon";
-import ReactMarkdown from "react-markdown";
+import { useState, type FunctionComponent } from "react"
+import { CheckIcon, ChevronDown, RightIcon } from "../../../utils/constant/icon"
+import ReactMarkdown from "react-markdown"
 
 type LessonPartProps = {
-  title: string;
-  complete: boolean;
-  minutes: string;
-  task: string;
-  theory: string; // markdown string
-  onClickResult: () => void;
-  onClickAccess: () => void;
-};
+  title: string
+  complete: boolean
+  minutes: string
+  task: string
+  theory: string // markdown string
+  onClickResult: () => void
+  onClickAccess: () => void
+}
 
 const LessonPart: FunctionComponent<LessonPartProps> = ({
   title,
@@ -21,7 +21,7 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
   onClickResult,
   onClickAccess,
 }) => {
-  const [openDropDown, setOpenDropDown] = useState(false);
+  const [openDropDown, setOpenDropDown] = useState(false)
 
   return (
     <div className="flex pb-6">
@@ -80,9 +80,9 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
 
           {/* Dropdown Content */}
           <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            className={`transition-all duration-200 overflow-hidden ease-in-out  ${
               openDropDown
-                ? "max-h-96 opacity-100 transform translate-y-0"
+                ? "max-h-[50%] opacity-100 transform translate-y-0"
                 : "max-h-0 opacity-0 transform -translate-y-2"
             }`}
           >
@@ -93,7 +93,7 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LessonPart;
+export default LessonPart

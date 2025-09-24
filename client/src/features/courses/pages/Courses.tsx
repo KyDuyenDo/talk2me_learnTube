@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { useCourses, useCategories } from "../../../hooks/useCoursesApi"
+import { useCourses, useCategories } from "../hooks/useCoursesApi"
 import { useCourseStore } from "../../../store/courseStore"
 
 import { CourseSearch } from "../components/CourseSearch"

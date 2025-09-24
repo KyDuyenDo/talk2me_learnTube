@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useCourseStore } from "../store/courseStore"
+import { useCourseStore } from "../../../store/courseStore"
 
-import { categoryApi, courseApi, youtubeApi } from "../features/courses/api/courseApi"
+import { categoryApi, courseApi, youtubeApi } from "../api/courseApi"
 import { useEffect } from "react"
 
 // Query keys
