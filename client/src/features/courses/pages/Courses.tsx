@@ -104,11 +104,11 @@ export function Courses() {
         <CreateCourseButton onClick={() => setShowCreateModal(true)} disabled={isLoading} />
       </div>
 
-      {!isLoading && courses.length > 0 && (
+      {/* {!isLoading && courses.length > 0 && (
         <div className="mb-8">
           <CourseStats courses={courses as Course[]} categories={categories as Category[]} />
         </div>
-      )}
+      )} */}
 
       <div className="mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">

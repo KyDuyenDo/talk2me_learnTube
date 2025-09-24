@@ -9,9 +9,9 @@ export interface Course {
   thumbnail: string
   channel: string
   categoryId: string
-  userId: string
-  createdAt: string
-  updatedAt: string
+  userId?: string
+  createdAt?: string
+  updatedAt?: string
   isCompleted?: boolean
   progress?: number
 }
