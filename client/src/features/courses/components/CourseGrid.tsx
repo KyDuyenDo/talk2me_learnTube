@@ -59,7 +59,7 @@ export const CourseGrid: FunctionComponent<CourseGridProps> = ({
               />
             </svg>
           </div>
-          <h3 className="text-[var(--font-size-lg)] font-medium text-[var(--color-text-primary)] mb-2">
+          <h3 className="text-[length:var(--font-size-lg)] font-medium text-[var(--color-text-primary)] mb-2">
             {emptyMessage}
           </h3>
           <p className="text-[var(--color-text-secondary)]">

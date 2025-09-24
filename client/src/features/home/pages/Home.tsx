@@ -1,4 +1,6 @@
 
+import CourseCard from "../../courses/components/CourseCard"
+import FolderCard from "../components/FlashCardDetail"
 import { Slider } from "../components/Slider"
 
 export const sampleCourses = [
@@ -164,42 +166,95 @@ export const sampleCourses = [
   },
 ]
 
+const mockFolders = [
+  {
+    id: "1",
+    title: "JavaScript Fundamentals",
+    description: "Essential concepts and syntax for JavaScript programming",
+    cardCount: 45,
+    color: "#10B981",
+    lastStudied: new Date("2024-01-15"),
+    isCompleted: false,
+  },
+  {
+    id: "2",
+    title: "React Hooks",
+    description: "Master useState, useEffect, and custom hooks",
+    cardCount: 32,
+    color: "#3B82F6",
+    lastStudied: new Date("2024-01-20"),
+    isCompleted: true,
+  },
+  {
+    id: "3",
+    title: "CSS Grid & Flexbox",
+    description: "Modern layout techniques for responsive design",
+    cardCount: 28,
+    color: "#8B5CF6",
+    lastStudied: new Date("2024-01-18"),
+    isCompleted: false,
+  },
+  {
+    id: "4",
+    title: "Node.js Basics",
+    description: "Server-side JavaScript and API development",
+    cardCount: 38,
+    color: "#F59E0B",
+    lastStudied: new Date("2024-01-22"),
+    isCompleted: false,
+  },
+  {
+    id: "5",
+    title: "Database Design",
+    description: "SQL fundamentals and database optimization",
+    cardCount: 52,
+    color: "#EF4444",
+    lastStudied: new Date("2024-01-19"),
+    isCompleted: true,
+  },
+  {
+    id: "6",
+    title: "TypeScript Advanced",
+    description: "Advanced types, generics, and best practices",
+    cardCount: 41,
+    color: "#06B6D4",
+    lastStudied: new Date("2024-01-21"),
+    isCompleted: false,
+  },
+]
+
+
 export default function HomePage() {
 
-  const courseCards = sampleCourses.map((course, i) => (
-    <div
-      key={i}
-      className="bg-white rounded-lg overflow-hidden transition-shadow h-full"
-    >
-      <div className="relative">
-        <img src={course.thumbnail || "/placeholder.svg"} alt={course.title} className="w-full h-36 object-cover" />
-      </div>
-      <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">{course.title}</h3>
-        <p className="text-xs text-gray-600">{course.channel}</p>
-      </div>
-    </div>
-  ))
-
   return (
-    <main className="container mx-auto px-4 py-8 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg p-6">
+    <main className="container mx-auto px-4 my-8 bg-gray-50 min-h-screen">
+      <div className="p-6">
         <Slider
-          title="Courses"
-          lengthView={sampleCourses.length}
+          title="Recent Flashcards"
+          lengthView={mockFolders.length + 1}
           onClickViewAll={() => console.log("View all courses clicked")}
         >
-          {courseCards}
+          {mockFolders.map((folder) => (
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              onClick={() => console.log(`Opening folder: ${folder.title}`)}
+            />
+          ))}
         </Slider>
       </div>
 
-      <div className="bg-white rounded-lg p-6 mt-8">
+      <div className="p-6 pt-0">
         <Slider
-          title="Popular Courses"
+          title="Recent Courses"
           lengthView={sampleCourses.length + 1}
           onClickViewAll={() => console.log("View all popular courses clicked")}
         >
-          {courseCards}
+          {
+            sampleCourses.map((course, i) => (
+              <CourseCard course={{ ...course, id: i.toString(), youtubeUrl: course.videoUrl, categoryId: course.category }} onClick={() => { }} />
+            ))
+          }
         </Slider>
       </div>
     </main>

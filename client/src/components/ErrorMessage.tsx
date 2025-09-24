@@ -9,7 +9,7 @@ interface ErrorMessageProps {
 const ErrorMessage: FunctionComponent<ErrorMessageProps> = ({ message, onRetry, className = "" }) => {
   return (
     <div
-      className={`bg-red-50 border-[var(--border-width-normal)] border-[var(--color-error)] rounded-[var(--border-radius-md)] p-[var(--spacing-lg)] ${className}`}
+      className={`bg-red-50 [border-width:var(--border-width-normal)] [border-color:var(--color-error)] rounded-[var(--border-radius-md)] p-[var(--spacing-lg)] ${className}`}
     >
       <div className="flex items-center">
         <div className="flex-shrink-0">
@@ -22,13 +22,13 @@ const ErrorMessage: FunctionComponent<ErrorMessageProps> = ({ message, onRetry, 
           </svg>
         </div>
         <div className="ml-3 flex-1">
-          <p className="text-[var(--font-size-sm)] text-[var(--color-error)]">{message}</p>
+          <p className="text-[length:var(--font-size-sm)] text-[var(--color-error)]">{message}</p>
         </div>
         {onRetry && (
           <div className="ml-4">
             <button
               onClick={onRetry}
-              className="text-[var(--font-size-sm)] font-medium text-[var(--color-error)] hover:text-red-800 focus:outline-none focus:underline"
+              className="text-[length:var(--font-size-sm)] font-medium text-[var(--color-error)] hover:text-red-800 focus:outline-none focus:underline"
             >
               Try again
             </button>

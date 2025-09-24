@@ -46,7 +46,7 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
       <button
         onClick={() => setShowDropDown(!showDropDown)}
         disabled={isLoading}
-        className="flex items-center justify-between w-full min-w-[200px] px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] hover:border-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center justify-between w-full min-w-[200px] px-[var(--spacing-md)] py-[var(--spacing-sm)] [border-width:var(--border-width-normal)] [border-color:var(--color-border)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] hover:border-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="flex items-center gap-2">
           <span className="font-medium">Categories</span>
@@ -55,13 +55,13 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
               {selectedCategoryNames.slice(0, 2).map((name, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 text-[var(--font-size-xs)] bg-[var(--color-primary)] text-white rounded-[var(--border-radius-sm)]"
+                  className="px-2 py-1 text-[length:var(--font-size-xs)] bg-[var(--color-primary)] text-white rounded-[var(--border-radius-sm)]"
                 >
                   {name}
                 </span>
               ))}
               {selectedCategoryNames.length > 2 && (
-                <span className="px-2 py-1 text-[var(--font-size-xs)] bg-[var(--color-text-muted)] text-white rounded-[var(--border-radius-sm)]">
+                <span className="px-2 py-1 text-[length:var(--font-size-xs)] bg-[var(--color-text-muted)] text-white rounded-[var(--border-radius-sm)]">
                   +{selectedCategoryNames.length - 2}
                 </span>
               )}
@@ -72,7 +72,7 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
       </button>
 
       {showDropDown && (
-        <div className="absolute z-50 top-full mt-1 w-full min-w-[280px] max-h-[320px] overflow-auto bg-[var(--color-background)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-md)] shadow-[var(--shadow-lg)]">
+        <div className="absolute z-50 top-full mt-1 w-full min-w-[280px] max-h-[320px] overflow-auto bg-[var(--color-background)] [border-width:var(--border-width-normal)] [border-color:var(--color-border)] rounded-[var(--border-radius-md)] shadow-[var(--shadow-lg)]">
           <div className="p-2">
             {onCreateCategory && (
               <>
@@ -81,7 +81,7 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
                     onCreateCategory()
                     setShowDropDown(false)
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-[var(--font-size-sm)] text-[var(--color-primary)] hover:bg-[var(--color-surface)] rounded-[var(--border-radius-sm)] transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-[length:var(--font-size-sm)] text-[var(--color-primary)] hover:bg-[var(--color-surface)] rounded-[var(--border-radius-sm)] transition-colors"
                 >
                   <PlusIcon className="w-4 h-4" />
                   Create New Category
@@ -94,7 +94,7 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
               <div className="px-3 py-4 text-center text-[var(--color-text-muted)]">
                 <p>No categories available</p>
                 {onCreateCategory && (
-                  <p className="text-[var(--font-size-xs)] mt-1">Create your first category to get started</p>
+                  <p className="text-[length:var(--font-size-xs)] mt-1">Create your first category to get started</p>
                 )}
               </div>
             ) : (
@@ -113,18 +113,18 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleCategoryToggle(category.id)}
-                            className="w-4 h-4 appearance-none border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-sm)] checked:bg-[var(--color-primary)] checked:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-1"
+                            className="w-4 h-4 appearance-none [border-width:var(--border-width-normal)] [border-color:var(--color-border)] rounded-[var(--border-radius-sm)] checked:bg-[var(--color-primary)] checked:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-1"
                           />
                           {isSelected && (
                             <CheckIcon className="absolute top-0 left-0 w-4 h-4 text-white pointer-events-none" />
                           )}
                         </div>
-                        <span className="text-[var(--font-size-sm)] text-[var(--color-text-primary)]">
+                        <span className="text-[length:var(--font-size-sm)] text-[var(--color-text-primary)]">
                           {category.name}
                         </span>
                       </div>
                       {category.courseCount !== undefined && (
-                        <span className="text-[var(--font-size-xs)] text-[var(--color-text-muted)] bg-[var(--color-surface)] px-2 py-1 rounded-[var(--border-radius-sm)]">
+                        <span className="text-[length:var(--font-size-xs)] text-[var(--color-text-muted)] bg-[var(--color-surface)] px-2 py-1 rounded-[var(--border-radius-sm)]">
                           {category.courseCount}
                         </span>
                       )}

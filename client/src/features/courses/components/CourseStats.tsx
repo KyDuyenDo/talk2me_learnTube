@@ -55,14 +55,14 @@ export const CourseStats: FunctionComponent<CourseStatsProps> = ({ courses, cate
         return (
           <div
             key={index}
-            className="bg-[var(--color-background)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-lg)] p-[var(--spacing-lg)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow"
+            className="bg-[var(--color-background)] [border-width:var(--border-width-normal)] [border-color:var(--color-border)] rounded-[var(--border-radius-lg)] p-[var(--spacing-lg)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[var(--font-size-sm)] text-[var(--color-text-secondary)] font-medium">
+                <p className="text-[length:var(--font-size-sm)] text-[var(--color-text-secondary)] font-medium">
                   {stat.label}
                 </p>
-                <p className="text-[var(--font-size-2xl)] font-bold text-[var(--color-text-primary)] mt-1">
+                <p className="text-[length:var(--font-size-2xl)] font-bold text-[var(--color-text-primary)] mt-1">
                   {stat.value}
                 </p>
               </div>

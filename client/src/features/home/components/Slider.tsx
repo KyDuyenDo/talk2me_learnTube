@@ -78,7 +78,7 @@ export function Slider({ children, title, onClickViewAll, lengthView }: SliderPr
   const totalPages = maxIndex + 1
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <span className="text-2xl font-bold text-gray-900">{title}</span>
@@ -108,7 +108,7 @@ export function Slider({ children, title, onClickViewAll, lengthView }: SliderPr
         </div>
       </div>
 
-      <div className="overflow-hidden" ref={containerRef}>
+      <div className="mb-4" ref={containerRef}>
         <div
           ref={itemsRef}
           className="flex transition-transform duration-500 ease-in-out gap-4"

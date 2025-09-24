@@ -1,16 +1,16 @@
-import { useState, type FunctionComponent } from "react";
-import { CheckIcon, ChevronDown, RightIcon } from "../../../utils/constant/icon";
-import ReactMarkdown from "react-markdown";
+import { useState, type FunctionComponent } from "react"
+import { CheckIcon, ChevronDown, RightIcon } from "../../../utils/constant/icon"
+import ReactMarkdown from "react-markdown"
 
 type LessonPartProps = {
-  title: string;
-  complete: boolean;
-  minutes: string;
-  task: string;
-  theory: string; // markdown string
-  onClickResult: () => void;
-  onClickAccess: () => void;
-};
+  title: string
+  complete: boolean
+  minutes: string
+  task: string
+  theory: string // markdown string
+  onClickResult: () => void
+  onClickAccess: () => void
+}
 
 const LessonPart: FunctionComponent<LessonPartProps> = ({
   title,
@@ -21,7 +21,7 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
   onClickResult,
   onClickAccess,
 }) => {
-  const [openDropDown, setOpenDropDown] = useState(false);
+  const [openDropDown, setOpenDropDown] = useState(false)
 
   return (
     <div className="flex pb-6">
@@ -36,19 +36,21 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
 
       {/* Content */}
       <div className="min-h-40 w-full bg-gray-300 rounded-sm">
-        <div className="flex flex-row justify-between items-center px-3 py-2 mb-2">
-          <div className="flex flex-col">
-            <div className="px-3 py-3">
-              <span className="text-2xl font-bold text-[#1b1f2e]">{title}</span>
+        <a onClick={() => onClickAccess()}>
+          <div className="flex flex-row justify-between items-center px-3 py-2 mb-2">
+            <div className="flex flex-col">
+              <div className="px-3 py-3">
+                <span className="text-2xl font-bold text-[#1b1f2e]">{title}</span>
+              </div>
+              <div>
+                <span className="px-3 text-xs font-medium">Complete: {complete.toString()}</span>
+                <span className="px-3 ml-10 text-xs font-medium">Minutes: {minutes}</span>
+                <span className="px-3 ml-10 text-xs font-medium">{task} tasks</span>
+              </div>
             </div>
-            <div>
-              <span className="px-3 text-xs font-medium">Complete: {complete.toString()}</span>
-              <span className="px-3 ml-10 text-xs font-medium">Minutes: {minutes}</span>
-              <span className="px-3 ml-10 text-xs font-medium">{task} tasks</span>
-            </div>
+            <RightIcon />
           </div>
-          <RightIcon />
-        </div>
+        </a>
 
         <div className="h-0.5 bg-gray-400 w-full"></div>
 
@@ -80,11 +82,10 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
 
           {/* Dropdown Content */}
           <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              openDropDown
-                ? "max-h-96 opacity-100 transform translate-y-0"
-                : "max-h-0 opacity-0 transform -translate-y-2"
-            }`}
+            className={`transition-all duration-200 overflow-hidden ease-in-out  ${openDropDown
+              ? "max-h-[50%] opacity-100 transform translate-y-0"
+              : "max-h-0 opacity-0 transform -translate-y-2"
+              }`}
           >
             <div className="mt-3 prose prose-sm prose-gray prose-h3:text-base prose-p:text-sm prose-li:text-sm">
               <ReactMarkdown>{theory}</ReactMarkdown>
@@ -93,7 +94,7 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LessonPart;
+export default LessonPart

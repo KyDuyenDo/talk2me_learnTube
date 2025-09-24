@@ -10,13 +10,7 @@ import RegisterPage from "./features/auth/pages/Register"
 import LoginPage from "./features/auth/pages/Login"
 import AccountPage from "./features/account/page/Account"
 import { Courses } from "./features/courses/pages/Courses"
-import { useUserStore } from './store/useUserStore';
-import { Navigate, Outlet } from "react-router-dom";
-
-export function ProtectedRoute() {
-  const { accessToken } = useUserStore();
-  return accessToken ? <Outlet /> : <Navigate to="/login" replace />;
-}
+import QuizPage from "./features/question/pages/Quiz"
 
 function App() {
   return (
@@ -34,6 +28,7 @@ function App() {
             </Route>
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
+          <Route path="/courses/:id/quiz" element={<QuizPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
