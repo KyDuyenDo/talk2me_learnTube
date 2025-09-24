@@ -7,9 +7,11 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
-import { register } from "../api/auth.service.ts"
+import { useRegister } from "../../../hooks/useAuth"
+
 
 const RegisterPage: FunctionComponent = () => {
+  const registerMutation = useRegister()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -82,12 +84,14 @@ const RegisterPage: FunctionComponent = () => {
       password: passwordError || undefined,
       general: !emailError && !passwordError && !email ? "Couldn't find your account." : undefined,
     })
-
-    register(formData).then((res: any) => {
-      if (res.error) {
-        setErrors((prev) => ({ ...prev, general: res.error }))
-      } else {
-        console.log(res.data)
+    if (!emailError && !passwordError && !email) return;
+    registerMutation.mutate(formData, {
+      onSuccess: (data) => {
+        if(data.error) setErrors({general: data.error});
+      },
+      onError: (error) => {
+        console.log(error)
+        return error.message;
       }
     })
   }

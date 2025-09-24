@@ -9,6 +9,13 @@ import DetailCourses from "./features/lesson-part/pages/DetailCourse"
 import RegisterPage from "./features/auth/pages/Register"
 import LoginPage from "./features/auth/pages/Login"
 import { Courses } from "./features/courses/pages/Courses"
+import { useUserStore } from './store/useUserStore';
+import { Navigate, Outlet } from "react-router-dom";
+
+export function ProtectedRoute() {
+  const { accessToken } = useUserStore();
+  return accessToken ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
 function App() {
   return (
@@ -17,10 +24,12 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/report" element={<QuizResults />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/courses" element={<Courses />} />
+              <Route path="/report" element={<QuizResults />} />
+            </Route>
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
         </Routes>

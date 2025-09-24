@@ -7,8 +7,11 @@ import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
 import ErrorAlert from "../components/ErrorAlert"
+import { useLogin } from "../../../hooks/useAuth";
+
 
 const LoginPage: FunctionComponent = () => {
+  const loginUser  = useLogin();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
@@ -66,6 +69,22 @@ const LoginPage: FunctionComponent = () => {
       password: passwordError || undefined,
       general: !emailError && !passwordError && !email ? "Couldn't find your account." : undefined,
     })
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+
+    if (!emailError && !passwordError) {
+      loginUser.mutate(formData, {
+        onSuccess: (res) => {
+          if (res.error) {
+            setErrors((prev)=>({...prev,  general: res.error as string }))
+          } else {
+            console.log(res.data)
+          }
+        }
+      })
+    }
   }
 
   return (

@@ -1,6 +1,6 @@
 import { api, handleApiError } from "../../../api/utils"
 
-export async function login(formData: FormData) {
+export async function loginUser(formData: FormData) {
   try {
     const response = await api.post("api/user/signin", formData, {
       headers: {
@@ -13,7 +13,7 @@ export async function login(formData: FormData) {
   }
 }
 
-export async function register(formData: FormData) {
+export async function registerUser(formData: FormData) {
   try {
     const response = await api.post("/api/user/create", formData, {
       headers: {
