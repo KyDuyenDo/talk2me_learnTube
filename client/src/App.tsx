@@ -9,6 +9,7 @@ import DetailCourses from "./features/lesson-part/pages/DetailCourse"
 import RegisterPage from "./features/auth/pages/Register"
 import LoginPage from "./features/auth/pages/Login"
 import { Courses } from "./features/courses/pages/Courses"
+import QuizPage from "./features/question/pages/Quiz"
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/report" element={<QuizResults />} />
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
+          <Route path="/courses/:id/quiz" element={<QuizPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

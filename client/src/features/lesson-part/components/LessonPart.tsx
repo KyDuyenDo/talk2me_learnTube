@@ -36,19 +36,21 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
 
       {/* Content */}
       <div className="min-h-40 w-full bg-gray-300 rounded-sm">
-        <div className="flex flex-row justify-between items-center px-3 py-2 mb-2">
-          <div className="flex flex-col">
-            <div className="px-3 py-3">
-              <span className="text-2xl font-bold text-[#1b1f2e]">{title}</span>
+        <a onClick={() => onClickAccess()}>
+          <div className="flex flex-row justify-between items-center px-3 py-2 mb-2">
+            <div className="flex flex-col">
+              <div className="px-3 py-3">
+                <span className="text-2xl font-bold text-[#1b1f2e]">{title}</span>
+              </div>
+              <div>
+                <span className="px-3 text-xs font-medium">Complete: {complete.toString()}</span>
+                <span className="px-3 ml-10 text-xs font-medium">Minutes: {minutes}</span>
+                <span className="px-3 ml-10 text-xs font-medium">{task} tasks</span>
+              </div>
             </div>
-            <div>
-              <span className="px-3 text-xs font-medium">Complete: {complete.toString()}</span>
-              <span className="px-3 ml-10 text-xs font-medium">Minutes: {minutes}</span>
-              <span className="px-3 ml-10 text-xs font-medium">{task} tasks</span>
-            </div>
+            <RightIcon />
           </div>
-          <RightIcon />
-        </div>
+        </a>
 
         <div className="h-0.5 bg-gray-400 w-full"></div>
 
@@ -80,11 +82,10 @@ const LessonPart: FunctionComponent<LessonPartProps> = ({
 
           {/* Dropdown Content */}
           <div
-            className={`transition-all duration-200 overflow-hidden ease-in-out  ${
-              openDropDown
-                ? "max-h-[50%] opacity-100 transform translate-y-0"
-                : "max-h-0 opacity-0 transform -translate-y-2"
-            }`}
+            className={`transition-all duration-200 overflow-hidden ease-in-out  ${openDropDown
+              ? "max-h-[50%] opacity-100 transform translate-y-0"
+              : "max-h-0 opacity-0 transform -translate-y-2"
+              }`}
           >
             <div className="mt-3 prose prose-sm prose-gray prose-h3:text-base prose-p:text-sm prose-li:text-sm">
               <ReactMarkdown>{theory}</ReactMarkdown>

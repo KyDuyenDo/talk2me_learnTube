@@ -244,7 +244,7 @@ export default function HomePage() {
         </Slider>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 pt-0">
         <Slider
           title="Recent Courses"
           lengthView={sampleCourses.length + 1}

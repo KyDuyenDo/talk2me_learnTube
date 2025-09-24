@@ -1,10 +1,11 @@
 import type { FunctionComponent } from "react"
 import LessonPart from "../components/LessonPart"
 import { LeftIcon } from "../../../utils/constant/icon"
+import { useNavigate } from "react-router-dom"
 
 
 interface CourseDetailProps {
-    params: { id: string }
+    params?: { id: string }
 }
 
 const lessonData = [
@@ -106,6 +107,7 @@ Phần Speaking giúp bạn rèn luyện kỹ năng nói và giao tiếp hiệu 
 ]
 
 const CourseDetail: FunctionComponent<CourseDetailProps> = ({ params }) => {
+    const navigate = useNavigate()
     const handleClickResult = (lessonTitle: string) => {
         alert(`Xem kết quả cho ${lessonTitle}`)
     }
@@ -119,10 +121,10 @@ const CourseDetail: FunctionComponent<CourseDetailProps> = ({ params }) => {
             <div className="p-3">
                 {/* Header */}
                 <div className="flex justify-start">
-                    <div className="flex">
+                    <button onClick={() => navigate(-1)} className="flex">
                         <LeftIcon />
                         <span className="text-[length:var(--font-size-sm)] text-[var(--color-primary)]">Back</span>
-                    </div>
+                    </button>
                 </div>
 
                 {/* Course Content */}
@@ -137,7 +139,7 @@ const CourseDetail: FunctionComponent<CourseDetailProps> = ({ params }) => {
                                 task={lesson.task}
                                 theory={lesson.theory}
                                 onClickResult={() => handleClickResult(lesson.title)}
-                                onClickAccess={() => handleClickAccess(lesson.title)}
+                                onClickAccess={() => navigate('/courses/1212/quiz')}
                             />
 
                         ))}

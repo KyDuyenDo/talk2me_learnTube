@@ -13,7 +13,7 @@ export const CourseCard: FunctionComponent<CourseCardProps> = ({ course, onClick
   const isCompleted = course.isCompleted || progressPercentage >= 100
 
   return (
-    <div className="bg-[var(--color-background)] rounded-[var(--border-radius-lg)] [border-width:var(--border-width-normal)] [border-color:var(--color-border)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-all duration-300 overflow-hidden group cursor-pointer">
+    <div className="bg-[var(--color-background)] rounded-[var(--border-radius-lg)] border [border-color:var(--color-border)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-all duration-300 overflow-hidden group cursor-pointer">
       <div className="flex flex-col h-full">
         <div className="p-4 pb-0">
           <div className="relative aspect-video overflow-hidden rounded-[var(--border-radius-md)] bg-gradient-to-br from-gray-100 to-gray-200">
