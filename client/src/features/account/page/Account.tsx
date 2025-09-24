@@ -7,18 +7,27 @@ import {
     LanguageIcon
 } from "../../../assets/icons";
 import { useState } from "react";
+import { logout } from "../../auth/api/auth.service";
 // Định nghĩa kiểu cho icon name
 
 
 export default function Account() {
     const [open, setOpen] = useState(false);
     const [openChange,setOpenChange] = useState(false)
+
+    const handleLogout = async () => {
+        alert("logout")
+        await logout()
+    }
+    
     const items = [
         { icon: <ProfileIcon />, title: "Profile", description: "Manage your profile details.",  onClick: () => setOpen(!open)},
         { icon: <LanguageIcon/>, title: "Language", description: "Manage your account settings.", },
         { icon: <LockIcon />, title: "Change password", description: "Manage your subscriptions.",  onClick: () => setOpenChange(!openChange)  },
-        { icon: <LogoutIcon/>, title: "Logout", description: "Logout from your account" },
+        { icon: <LogoutIcon/>, title: "Logout", description: "Logout from your account", onclick: handleLogout },
     ];
+
+
 
     return (
         <>

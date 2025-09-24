@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ProfileIcon,
     MailIcon,
@@ -6,6 +6,7 @@ import {
     TrashIcon,
     ArrowLeftIcon,
 } from "../../../assets/icons";
+import { getInforUser } from "../../auth/api/auth.service";
 
 type ProfileProps = {
     onOpen: boolean;
@@ -37,6 +38,21 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
             console.log("Account deleted");
         }
     };
+
+    const fetchInforUser = async () => {
+        try{
+            const req = await getInforUser()
+            if(req?.data){
+                setUser(req.data)
+            }
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    useEffect(()=>{
+        fetchInforUser()
+    },[])
 
     return (
         <div

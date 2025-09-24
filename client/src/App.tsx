@@ -11,6 +11,8 @@ import LoginPage from "./features/auth/pages/Login"
 import AccountPage from "./features/account/page/Account"
 import { Courses } from "./features/courses/pages/Courses"
 import QuizPage from "./features/question/pages/Quiz"
+import { useUserStore } from './store/useUserStore';
+import { Navigate, Outlet } from "react-router-dom";
 
 function App() {
   return (
@@ -36,3 +38,9 @@ function App() {
 }
 
 export default App
+
+
+export function ProtectedRoute() {
+  const { accessToken } = useUserStore();
+  return accessToken ? <Outlet /> : <Navigate to="/login" replace />;
+}

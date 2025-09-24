@@ -1,31 +1,57 @@
-import axios from 'axios'
+import axios from "axios";
+import { useUserStore } from "../store/useUserStore";
 
-const baseURL = 'http://localhost:8000';
+const baseURL = "http://localhost:8000";
 
-const authInterceptor = (req: any) => {
-    //const token = JSON.parse(localStorage.getItem('profile') || "")?.accessToken;
-    // if (token) {
-    // }
-    req.headers['Authorization'] = `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2JjMTgxMjFlMmFiMjgxY2NkZDdiNSIsImVtYWlsIjoiZHV5ZW5rMjAwQGdtYWlsLmNvbSIsImlhdCI6MTc1ODY3Nzg0NCwiZXhwIjoxNzU4Njk5NDQ0fQ.c-vN-5uDnPHa1yNUPDU6LAE4eoY84-SyorxtoHxDnOA'}`;
-    return req;
-}
+const api = axios.create({
+  baseURL,
+  withCredentials: true,
+  headers: {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+  },
+});
 
-export const api = axios.create({
-    baseURL,
-    withCredentials: true,
-    headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+// Request Interceptor -> luôn attach token vào header
+api.interceptors.request.use((config) => {
+  const token = useUserStore.getState().accessToken;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Response Interceptor -> auto refresh nếu 401
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const res = await api.get("/api/user/refresh"); // gọi refresh endpoint
+        const newToken = res.data.accessToken;
+
+        // lưu vào zustand
+        useUserStore.setState({ accessToken: newToken });
+
+        // gắn lại token mới vào request cũ
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+        return api(originalRequest); // retry lại request cũ
+      } catch (err) {
+        // refresh fail -> logout
+        useUserStore.setState({ accessToken: null });
+        window.location.href = "/login";
+      }
     }
-})
 
-api.interceptors.request.use(authInterceptor)
-
-export const handleApiError = async (error: any) => {
-    try {
-        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
-        const data = null;
-        return { error: errorMessage, data };
-    } catch (err) {
-        throw new Error("An unexpected error occurred.");
+    if (error.response?.status === 403) {
+      window.location.href = "/login";
     }
-};
+
+    return Promise.reject(error);
+  }
+);
+
+export { api };

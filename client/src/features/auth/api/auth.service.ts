@@ -1,4 +1,4 @@
-import { api, handleApiError } from "../../../api/utils"
+import { api } from "../../../api/utils"
 
 export async function loginUser(formData: FormData) {
   try {
@@ -9,7 +9,7 @@ export async function loginUser(formData: FormData) {
     })
     return { error: null, data: response.data }
   } catch (error) {
-    return await handleApiError(error)
+    console.log(error)
   }
 }
 
@@ -22,6 +22,23 @@ export async function registerUser(formData: FormData) {
     })
     return { error: null, data: response.data }
   } catch (error) {
-    return await handleApiError(error)
+    console.log(error)
+  }
+}
+
+export async function getInforUser() {
+  try {
+    const response = await api.get("/api/user/getInfoUser")
+    return { error: null, data: response.data }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function logout() {
+   try {
+    await api.get("/api/user/logout")
+  } catch (error) {
+    console.log(error)
   }
 }
