@@ -1,372 +1,356 @@
-import type React from "react"
-
-import { useState, useEffect, type FunctionComponent } from "react"
-import { Modal } from "../../../components/Modal"
-import LoadingSpinner from "../../../components/LoadingSpinner"
-import { useCreateCourse, useCreateCategory } from "../../../hooks/useCoursesApi"
-import { useYouTubeInfo } from "../../../hooks/useCoursesApi"
-import { useCourseStore } from "../../../store/courseStore"
-import { validateYouTubeUrl } from "../../../utils/youtube"
+import { useState, useEffect, useRef, type FunctionComponent } from "react"
+import { useForm, Controller } from "react-hook-form"
 import type { Category } from "../../../store/courseStore"
-// import { PlusIcon, ExternalLinkIcon, AlertCircleIcon } from "../../../utils/constant/icon"
+import type { VideoInfo, FormData } from "../types"
+import { useYouTubeInfo } from "../../../hooks/useCoursesApi"
 
 interface CreateCourseModalProps {
   isOpen: boolean
   onClose: () => void
   categories: Category[]
-  userId: string
 }
 
-interface FormData {
-  title: string
-  description: string
-  youtubeUrl: string
-  categoryId: string
-  newCategoryName: string
+const validateYouTubeUrl = (url: string): boolean => {
+  const youtubeRegex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}$/
+  return youtubeRegex.test(url)
 }
 
-interface VideoInfo {
-  title: string
-  channel: string
-  thumbnail: string
-  duration: string
-  videoId: string
-}
-
-export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({
-  isOpen,
-  onClose,
-  categories,
-  userId,
-}) => {
-  const [formData, setFormData] = useState<FormData>({
-    title: "",
-    description: "",
-    youtubeUrl: "",
-    categoryId: "",
-    newCategoryName: "",
-  })
-
+export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({ isOpen, onClose, categories }) => {
   const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null)
   const [showCreateCategory, setShowCreateCategory] = useState(false)
-  const [errors, setErrors] = useState<Partial<FormData>>({})
-  const [isValidatingUrl, setIsValidatingUrl] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: youtubeInfoMutateAsync, isPending: isLoading } = useYouTubeInfo()
 
-  const createCourseMutation = useCreateCourse()
-  const createCategoryMutation = useCreateCategory()
-  const youtubeInfoMutation = useYouTubeInfo()
-  const { setError } = useCourseStore()
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      title: "",
+      description: "",
+      youtubeUrl: "",
+      categoryId: "",
+      newCategoryName: "",
+    },
+  })
 
-  // Reset form when modal opens/closes
+  const lastFetchedUrlRef = useRef<string>("")
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const youtubeUrl = watch("youtubeUrl")
+
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        title: "",
-        description: "",
-        youtubeUrl: "",
-        categoryId: "",
-        newCategoryName: "",
-      })
+      reset()
       setVideoInfo(null)
       setShowCreateCategory(false)
-      setErrors({})
+      lastFetchedUrlRef.current = ""
     }
-  }, [isOpen])
+  }, [isOpen, reset])
 
-  // Validate YouTube URL and fetch video info
   useEffect(() => {
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current)
+    }
+
     const validateAndFetchVideoInfo = async () => {
-      if (!formData.youtubeUrl.trim()) {
+      const url = youtubeUrl?.trim() || ""
+
+      if (!url) {
         setVideoInfo(null)
+        lastFetchedUrlRef.current = ""
         return
       }
 
-      if (!validateYouTubeUrl(formData.youtubeUrl)) {
-        setErrors((prev) => ({ ...prev, youtubeUrl: "Please enter a valid YouTube URL" }))
+      if (!validateYouTubeUrl(url)) {
+        setError("youtubeUrl", {
+          type: "manual",
+          message: "Please enter a valid YouTube URL",
+        })
         setVideoInfo(null)
+        lastFetchedUrlRef.current = ""
         return
       }
 
-      setIsValidatingUrl(true)
-      setErrors((prev) => ({ ...prev, youtubeUrl: undefined }))
+      if (url === lastFetchedUrlRef.current) {
+        return
+      }
+
+      clearErrors("youtubeUrl")
+
+      lastFetchedUrlRef.current = url
 
       try {
-        const info = await youtubeInfoMutation.mutateAsync(formData.youtubeUrl)
+        const info = await youtubeInfoMutateAsync(url)
+        console.log(info)
         setVideoInfo(info)
 
-        // Auto-fill title if empty
-        if (!formData.title.trim()) {
-          setFormData((prev) => ({ ...prev, title: info.title }))
+        const currentTitle = watch("title")
+        if (!currentTitle?.trim()) {
+          setValue("title", info.title)
         }
       } catch (error) {
-        setErrors((prev) => ({ ...prev, youtubeUrl: "Failed to fetch video information" }))
+        setError("youtubeUrl", {
+          type: "manual",
+          message: "Failed to fetch video information",
+        })
         setVideoInfo(null)
-      } finally {
-        setIsValidatingUrl(false)
+        lastFetchedUrlRef.current = ""
       }
     }
 
-    const timeoutId = setTimeout(validateAndFetchVideoInfo, 500)
-    return () => clearTimeout(timeoutId)
-  }, [formData.youtubeUrl, youtubeInfoMutation])
+    fetchTimeoutRef.current = setTimeout(validateAndFetchVideoInfo, 500)
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
+    return () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current)
+      }
     }
-  }
+  }, [youtubeUrl, setError, clearErrors, setValue, watch])
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {}
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required"
-    }
-
-    if (!formData.youtubeUrl.trim()) {
-      newErrors.youtubeUrl = "YouTube URL is required"
-    } else if (!validateYouTubeUrl(formData.youtubeUrl)) {
-      newErrors.youtubeUrl = "Please enter a valid YouTube URL"
-    }
-
-    if (!showCreateCategory && !formData.categoryId) {
-      newErrors.categoryId = "Please select a category"
-    }
-
-    if (showCreateCategory && !formData.newCategoryName.trim()) {
-      newErrors.newCategoryName = "Category name is required"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm() || !videoInfo) {
+  const onSubmit = async (data: FormData) => {
+    if (!videoInfo) {
+      setError("youtubeUrl", {
+        type: "manual",
+        message: "Please wait for video information to load",
+      })
       return
     }
 
-    try {
-      let categoryId = formData.categoryId
+    setIsSubmitting(true)
 
-      // Create new category if needed
-      if (showCreateCategory && formData.newCategoryName.trim()) {
-        const newCategory = await createCategoryMutation.mutateAsync({
-          name: formData.newCategoryName.trim(),
-          userId,
-        })
-        categoryId = newCategory.id
+    try {
+      let categoryId = data.categoryId
+
+      if (showCreateCategory && data.newCategoryName.trim()) {
+        console.log("Creating new category:", data.newCategoryName.trim())
+        categoryId = "new-category-id"
       }
 
-      // Create course
-      await createCourseMutation.mutateAsync({
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        youtubeUrl: formData.youtubeUrl.trim(),
+      console.log("Creating course:", {
+        title: data.title.trim(),
+        description: data.description.trim(),
+        youtubeUrl: data.youtubeUrl.trim(),
         categoryId,
-        userId,
       })
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       onClose()
     } catch (error) {
       console.error("Failed to create course:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const isLoading = createCourseMutation.isLoading || createCategoryMutation.isLoading
+  if (!isOpen) return null
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add New Course" size="lg">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* YouTube URL Input */}
-        <div>
-          <label className="block text-[var(--font-size-sm)] font-medium text-[var(--color-text-primary)] mb-2">
-            YouTube URL *
-          </label>
-          <div className="relative">
-            <input
-              type="url"
-              value={formData.youtubeUrl}
-              onChange={(e) => handleInputChange("youtubeUrl", e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=..."
-              className={`w-full px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-                errors.youtubeUrl ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
-              }`}
-            />
-            {isValidatingUrl && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <LoadingSpinner size="sm" />
-              </div>
-            )}
-          </div>
-          {errors.youtubeUrl && (
-            <p className="mt-1 text-[var(--font-size-xs)] text-[var(--color-error)] flex items-center gap-1">
-              {/* <AlertCircleIcon className="w-3 h-3" /> */}
-              <div className="w-3 h-3">⚠️</div>
-              {errors.youtubeUrl}
-            </p>
-          )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Add New Course</h2>
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* Video Preview */}
-        {videoInfo && (
-          <div className="bg-[var(--color-surface)] rounded-[var(--border-radius-md)] p-4">
-            <div className="flex gap-4">
-              <img
-                src={videoInfo.thumbnail || "/placeholder.svg"}
-                alt={videoInfo.title}
-                className="w-32 h-18 object-cover rounded-[var(--border-radius-sm)]"
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">YouTube URL *</label>
+            <div className="relative">
+              <Controller
+                name="youtubeUrl"
+                control={control}
+                rules={{ required: "YouTube URL is required" }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.youtubeUrl ? "border-red-500" : "border-gray-300"
+                      }`}
+                  />
+                )}
               />
-              <div className="flex-1">
-                <h4 className="font-medium text-[var(--color-text-primary)] mb-1">{videoInfo.title}</h4>
-                <p className="text-[var(--font-size-sm)] text-[var(--color-text-secondary)] mb-2">
-                  {videoInfo.channel}
-                </p>
-                <div className="flex items-center gap-2 text-[var(--font-size-xs)] text-[var(--color-text-muted)]">
-                  <span>Duration: {videoInfo.duration}</span>
-                  <a
-                    href={formData.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[var(--color-primary)] hover:underline"
-                  >
-                    <div className="w-3 h-3">🔗</div>
-                    View on YouTube
-                  </a>
+              {isLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+            {errors.youtubeUrl && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {errors.youtubeUrl.message}
+              </p>
+            )}
+          </div>
+
+          {videoInfo && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex gap-4">
+                <img
+                  src={videoInfo.thumbnail || "/placeholder.svg"}
+                  alt={videoInfo.title}
+                  className="w-32 h-18 object-cover rounded"
+                />
+                <div className="flex-1">
+                  <h4 className="font-medium mb-1 text-gray-900">{videoInfo.title}</h4>
+                  <p className="text-sm text-gray-600 mb-2">{videoInfo.channel}</p>
                 </div>
               </div>
             </div>
+          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+
+            {!showCreateCategory ? (
+              <div className="space-y-3">
+                <Controller
+                  name="categoryId"
+                  control={control}
+                  rules={{ required: "Please select a category" }}
+                  render={({ field }) => (
+                    <div className="relative">
+                      <select
+                        {...field}
+                        className={`w-full px-4 py-3 pr-10 border rounded-lg shadow-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer hover:border-gray-400 ${errors.categoryId ? "border-red-500 focus:ring-red-500" : "border-gray-300"
+                          }`}
+                      >
+                        <option value="" className="text-gray-500">
+                          Select a category
+                        </option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id} className="text-gray-900 py-2">
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg
+                          className={`w-5 h-5 transition-colors ${errors.categoryId ? "text-red-500" : "text-gray-400"
+                            }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowCreateCategory(true)}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors hover:bg-blue-50 px-3 py-2 rounded-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create new category
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Controller
+                  name="newCategoryName"
+                  control={control}
+                  rules={{ required: "Category name is required" }}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      placeholder="Enter new category name"
+                      className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 ${errors.newCategoryName ? "border-red-500 focus:ring-red-500" : "border-gray-300"
+                        }`}
+                    />
+                  )}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateCategory(false)
+                    setValue("newCategoryName", "")
+                    clearErrors("newCategoryName")
+                  }}
+                  className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors hover:bg-gray-50 px-3 py-2 rounded-md flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                    />
+                  </svg>
+                  Back to category selection
+                </button>
+              </div>
+            )}
+
+            {(errors.categoryId || errors.newCategoryName) && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {errors.categoryId?.message || errors.newCategoryName?.message}
+              </p>
+            )}
           </div>
-        )}
-
-        {/* Course Title */}
-        <div>
-          <label className="block text-[var(--font-size-sm)] font-medium text-[var(--color-text-primary)] mb-2">
-            Course Title *
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => handleInputChange("title", e.target.value)}
-            placeholder="Enter course title"
-            className={`w-full px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-              errors.title ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
-            }`}
-          />
-          {errors.title && (
-            <p className="mt-1 text-[var(--font-size-xs)] text-[var(--color-error)] flex items-center gap-1">
-              {/* <AlertCircleIcon className="w-3 h-3" /> */}
-              {errors.title}
-            </p>
-          )}
-        </div>
-
-        {/* Course Description */}
-        <div>
-          <label className="block text-[var(--font-size-sm)] font-medium text-[var(--color-text-primary)] mb-2">
-            Description (Optional)
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            placeholder="Enter course description"
-            rows={3}
-            className="w-full px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
-          />
-        </div>
-
-        {/* Category Selection */}
-        <div>
-          <label className="block text-[var(--font-size-sm)] font-medium text-[var(--color-text-primary)] mb-2">
-            Category *
-          </label>
-
-          {!showCreateCategory ? (
-            <div className="space-y-3">
-              <select
-                value={formData.categoryId}
-                onChange={(e) => handleInputChange("categoryId", e.target.value)}
-                className={`w-full px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-                  errors.categoryId ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
-                }`}
-              >
-                <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                type="button"
-                onClick={() => setShowCreateCategory(true)}
-                className="flex items-center gap-2 text-[var(--font-size-sm)] text-[var(--color-primary)] hover:underline"
-              >
-                <div className="w-4 h-4">➕</div>
-                Create new category
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={formData.newCategoryName}
-                onChange={(e) => handleInputChange("newCategoryName", e.target.value)}
-                placeholder="Enter new category name"
-                className={`w-full px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-                  errors.newCategoryName ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
-                }`}
-              />
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCreateCategory(false)
-                  setFormData((prev) => ({ ...prev, newCategoryName: "" }))
-                  setErrors((prev) => ({ ...prev, newCategoryName: undefined }))
-                }}
-                className="text-[var(--font-size-sm)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-              >
-                ← Back to category selection
-              </button>
-            </div>
-          )}
-
-          {(errors.categoryId || errors.newCategoryName) && (
-            <p className="mt-1 text-[var(--font-size-xs)] text-[var(--color-error)] flex items-center gap-1">
-              <div className="w-3 h-3">⚠️</div>
-              {errors.categoryId || errors.newCategoryName}
-            </p>
-          )}
-        </div>
-
-        {/* Form Actions */}
-        <div className="flex gap-3 pt-4 border-t border-[var(--color-border)]">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="flex-1 px-4 py-2 text-[var(--font-size-sm)] font-medium text-[var(--color-text-secondary)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-md)] hover:bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading || !videoInfo}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-[var(--font-size-sm)] font-medium text-white bg-[var(--color-primary)] rounded-[var(--border-radius-md)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isLoading && <LoadingSpinner size="sm" />}
-            {isLoading ? "Creating..." : "Create Course"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || !videoInfo}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            >
+              {isSubmitting && (
+                <div className="mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              )}
+              {isSubmitting ? "Creating..." : "Create Course"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
 

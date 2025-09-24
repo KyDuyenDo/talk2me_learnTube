@@ -1,7 +1,6 @@
 import type { Category, Course } from "../../../store/courseStore";
-import { api } from "../../../api/utils"; // axios instance
+import { api } from "../../../api/utils";
 
-// API Response types
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -17,7 +16,7 @@ interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-const API_BASE_URL = "http://localhost:3001/api";
+const API_BASE_URL = "http://127.0.0.1:5000/api/generate";
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -72,7 +71,6 @@ export const courseApi = {
     description?: string;
     youtubeUrl: string;
     categoryId: string;
-    userId: string;
   }): Promise<Course> => {
     const formData = new FormData();
     for (const key in courseData) {
@@ -105,9 +103,7 @@ export const courseApi = {
   },
 };
 
-// ---------------------
-// Category API
-// ---------------------
+
 export const categoryApi = {
   getCategories: async (): Promise<Category[]> => {
     const response = await api.get<ApiResponse<Category[]>>(`/api/categories`);
@@ -135,21 +131,24 @@ export const categoryApi = {
   },
 };
 
-// ---------------------
-// YouTube API
-// ---------------------
 export const youtubeApi = {
   getVideoInfo: async (youtubeUrl: string) => {
-    const response = await api.post<ApiResponse<{ title: string; channel: string; thumbnail: string; duration: string; videoId: string }>>(
-      `${API_BASE_URL}/youtube/info`,
-      { url: youtubeUrl }
+    const response = await api.post(
+      `${API_BASE_URL}/youtube-info`,
+      { youtubeUrl: youtubeUrl },
+      {
+        headers: {
+          "X-API-KEY": "12345",
+        },
+        withCredentials: true,
+      }
     );
 
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || "Failed to fetch video information");
+    if (!response.data) {
+      throw new Error("Failed to fetch video information");
     }
 
-    return response.data.data;
+    return response.data;
   },
 
   validateUrl: async (youtubeUrl: string): Promise<boolean> => {

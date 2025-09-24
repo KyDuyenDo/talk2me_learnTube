@@ -50,9 +50,9 @@ export const useCourse = (courseId: string) => {
   const { setSelectedCourse } = useCourseStore()
 
   const query = useQuery({
-    queryKey: courseKeys.detail(userId, courseId),
-    queryFn: () => courseApi.getCourse(userId, courseId),
-    enabled: !!courseId && !!userId,
+    queryKey: courseKeys.detail(courseId),
+    queryFn: () => courseApi.getCourse(courseId),
+    enabled: !!courseId,
     staleTime: 1000 * 60 * 2,
   })
 
@@ -65,13 +65,12 @@ export const useCourse = (courseId: string) => {
   return
 }
 
-export const useCategories = (userId: string) => {
+export const useCategories = () => {
   const { setCategories } = useCourseStore()
 
   const query = useQuery({
-    queryKey: categoryKeys.list(userId),
-    queryFn: () => categoryApi.getCategories(userId),
-    enabled: !!userId,
+    queryKey: categoryKeys.list(),
+    queryFn: () => categoryApi.getCategories(),
     staleTime: 1000 * 60 * 10,
   })
 
@@ -105,8 +104,8 @@ export const useDeleteCourse = () => {
   const { removeCourse } = useCourseStore()
 
   return useMutation({
-    mutationFn: ({ courseId, userId }: { courseId: string; userId: string }) =>
-      courseApi.deleteCourse(courseId, userId),
+    mutationFn: ({ courseId, }: { courseId: string; }) =>
+      courseApi.deleteCourse(courseId,),
     onSuccess: (_, { courseId }) => {
       removeCourse(courseId)
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
@@ -119,11 +118,11 @@ export const useUpdateProgress = () => {
   const { updateCourse } = useCourseStore()
 
   return useMutation({
-    mutationFn: ({ courseId, userId, progress }: { courseId: string; userId: string; progress: number }) =>
-      courseApi.updateProgress(courseId, userId, progress),
+    mutationFn: ({ courseId, progress }: { courseId: string; progress: number }) =>
+      courseApi.updateProgress(courseId, progress),
     onSuccess: (updatedCourse) => {
       updateCourse(updatedCourse.id, { progress: updatedCourse.progress, isCompleted: updatedCourse.isCompleted })
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse.userId, updatedCourse.id) })
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse.id) })
     },
   })
 }
@@ -147,8 +146,8 @@ export const useDeleteCategory = () => {
   const { removeCategory } = useCourseStore()
 
   return useMutation({
-    mutationFn: ({ categoryId, userId }: { categoryId: string; userId: string }) =>
-      categoryApi.deleteCategory(categoryId, userId),
+    mutationFn: ({ categoryId, }: { categoryId: string; }) =>
+      categoryApi.deleteCategory(categoryId,),
     onSuccess: (_, { categoryId }) => {
       removeCategory(categoryId)
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })

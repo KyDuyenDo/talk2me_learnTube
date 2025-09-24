@@ -1,4 +1,5 @@
 import { useState, useEffect, type FunctionComponent } from "react"
+import { SearchIcon, Xmark } from "../../../utils/constant/icon"
 
 interface CourseSearchProps {
   onSearch: (query: string) => void
@@ -32,14 +33,12 @@ export const CourseSearch: FunctionComponent<CourseSearchProps> = ({
   return (
     <div className="relative">
       <div
-        className={`flex items-center px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] transition-colors ${
-          isFocused
-            ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20"
-            : "border-[var(--color-border)] hover:border-[var(--color-text-secondary)]"
-        }`}
+        className={`flex items-center px-[var(--spacing-md)] py-[var(--spacing-sm)] border-[var(--border-width-normal)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] transition-colors ${isFocused
+          ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20"
+          : "border-[var(--color-border)] hover:border-[var(--color-text-secondary)]"
+          }`}
       >
-        {/* <SearchIcon className="w-4 h-4 text-[var(--color-text-muted)] mr-3" /> */}
-        <div className="w-4 h-4 text-[var(--color-text-muted)] mr-3">🔍</div>
+        <SearchIcon className="w-4 h-4 text-[var(--color-text-muted)] mr-3" />
         <input
           type="text"
           value={searchQuery}
@@ -54,8 +53,7 @@ export const CourseSearch: FunctionComponent<CourseSearchProps> = ({
             onClick={handleClear}
             className="ml-2 p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
           >
-            {/* <XIcon className="w-4 h-4" /> */}
-            <div className="w-4 h-4">❌</div>
+            <Xmark className="w-4 h-4" />
           </button>
         )}
       </div>

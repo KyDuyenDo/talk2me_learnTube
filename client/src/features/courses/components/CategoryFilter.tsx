@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FunctionComponent } from "react"
-// import { CheckIcon, ChevronDown, PlusIcon } from "../../../utils/constant/icon"
 import type { Category } from "../../../store/courseStore"
+import { CheckIcon, ChevronDown, PlusIcon } from "../../../utils/constant/icon"
 
 interface CategoryFilterProps {
   categories: Category[]
@@ -68,14 +68,12 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
             </div>
           )}
         </div>
-        {/* <ChevronDown className={`w-4 h-4 transition-transform ${showDropDown ? "rotate-180" : ""}`} /> */}
-        <div>down</div>
+        <ChevronDown className={`w-4 h-4 transition-transform ${showDropDown ? "rotate-180" : ""}`} />
       </button>
 
       {showDropDown && (
         <div className="absolute z-50 top-full mt-1 w-full min-w-[280px] max-h-[320px] overflow-auto bg-[var(--color-background)] border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-md)] shadow-[var(--shadow-lg)]">
           <div className="p-2">
-            {/* Create New Category Button */}
             {onCreateCategory && (
               <>
                 <button
@@ -85,15 +83,13 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 text-[var(--font-size-sm)] text-[var(--color-primary)] hover:bg-[var(--color-surface)] rounded-[var(--border-radius-sm)] transition-colors"
                 >
-                  {/* <PlusIcon className="w-4 h-4" /> */}
-                  <div>+</div>
+                  <PlusIcon className="w-4 h-4" />
                   Create New Category
                 </button>
                 <div className="h-px bg-[var(--color-border)] my-2" />
               </>
             )}
 
-            {/* Category List */}
             {categories.length === 0 ? (
               <div className="px-3 py-4 text-center text-[var(--color-text-muted)]">
                 <p>No categories available</p>
@@ -120,8 +116,7 @@ export const CategoryFilter: FunctionComponent<CategoryFilterProps> = ({
                             className="w-4 h-4 appearance-none border-[var(--border-width-normal)] border-[var(--color-border)] rounded-[var(--border-radius-sm)] checked:bg-[var(--color-primary)] checked:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-1"
                           />
                           {isSelected && (
-                            // <CheckIcon className="absolute top-0 left-0 w-4 h-4 text-white pointer-events-none" />
-                            <div>✓</div>
+                            <CheckIcon className="absolute top-0 left-0 w-4 h-4 text-white pointer-events-none" />
                           )}
                         </div>
                         <span className="text-[var(--font-size-sm)] text-[var(--color-text-primary)]">

@@ -3,12 +3,21 @@ from flask import Blueprint, Flask, abort, jsonify, request
 from dotenv import load_dotenv
 from agent import QuestionGenerator
 from youtube_transcript_api import YouTubeTranscriptApi
+from flask_cors import CORS
 import yt_dlp
 
 
 load_dotenv(override=True)
 gen = QuestionGenerator()
+
 app = Flask(__name__)
+CORS(
+    app,
+    resources={r"/api/*": {"origins": "http://localhost:5173"}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization", "X-API-KEY", "Cache-Control"]
+)
+
 
 # setting server
 api_generate = Blueprint("api_generate", __name__)
@@ -16,6 +25,8 @@ api_generate = Blueprint("api_generate", __name__)
 # main api
 @api_generate.before_request
 def check_api_key():
+    if request.method == "OPTIONS":
+        return None  
     key = request.headers.get("X-API-KEY")
     if key != os.getenv("PRIVATE_API_KEY"):
         abort(403, description="Forbidden: Invalid API key")
@@ -53,7 +64,7 @@ def generate_speaking():
     
     return 'Hello, World!'
 
-@api_generate.route('/info', methods=["POST"])
+@api_generate.route('/youtube-info', methods=["POST"])
 def get_info_youtubeUrl():
     try:
         data = request.get_json()
@@ -68,7 +79,8 @@ def get_info_youtubeUrl():
 
         info = {
             "title": info_dict.get("title", ""),
-            "thumbnail": info_dict.get("thumbnail", "")
+            "thumbnail": info_dict.get("thumbnail", ""),
+            "channel": info_dict.get("channel", "")
         }
 
         return jsonify(info), 200

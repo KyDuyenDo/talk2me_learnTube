@@ -9,9 +9,6 @@ interface CourseGridProps {
   isLoading?: boolean
   error?: string | null
   onCourseClick?: (course: Course) => void
-  onCourseEdit?: (course: Course) => void
-  onCourseDelete?: (course: Course) => void
-  showActions?: boolean
   emptyMessage?: string
   onRetry?: () => void
 }
@@ -21,9 +18,6 @@ export const CourseGrid: FunctionComponent<CourseGridProps> = ({
   isLoading = false,
   error = null,
   onCourseClick,
-  onCourseEdit,
-  onCourseDelete,
-  showActions = false,
   emptyMessage = "No courses found",
   onRetry,
 }) => {
@@ -83,9 +77,6 @@ export const CourseGrid: FunctionComponent<CourseGridProps> = ({
           key={course.id}
           course={course}
           onClick={() => onCourseClick?.(course)}
-          onEdit={() => onCourseEdit?.(course)}
-          onDelete={() => onCourseDelete?.(course)}
-          showActions={showActions}
         />
       ))}
     </div>

@@ -1,21 +1,14 @@
 import type { FunctionComponent } from "react"
 import type { Course } from "../../../store/courseStore"
-// import { PlayIcon, ClockIcon, CheckCircleIcon } from "../../../utils/constant/icon"
 
 interface CourseCardProps {
   course: Course
   onClick?: () => void
-  onEdit?: () => void
-  onDelete?: () => void
-  showActions?: boolean
 }
 
 export const CourseCard: FunctionComponent<CourseCardProps> = ({
   course,
   onClick,
-  onEdit,
-  onDelete,
-  showActions = false,
 }) => {
   const progressPercentage = course.progress || 0
   const isCompleted = course.isCompleted || progressPercentage >= 100
@@ -82,30 +75,6 @@ export const CourseCard: FunctionComponent<CourseCardProps> = ({
             </div>
             {course.createdAt && <span>{new Date(course.createdAt).toLocaleDateString()}</span>}
           </div>
-
-          {/* Action Buttons */}
-          {showActions && (
-            <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEdit?.()
-                }}
-                className="flex-1 px-3 py-1 text-[var(--font-size-xs)] font-medium text-[var(--color-primary)] border-[var(--border-width-thin)] border-[var(--color-primary)] rounded-[var(--border-radius-sm)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
-              >
-                Edit
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete?.()
-                }}
-                className="flex-1 px-3 py-1 text-[var(--font-size-xs)] font-medium text-[var(--color-error)] border-[var(--border-width-thin)] border-[var(--color-error)] rounded-[var(--border-radius-sm)] hover:bg-[var(--color-error)] hover:text-white transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

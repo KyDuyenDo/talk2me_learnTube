@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCourses, useCategories } from "../../../hooks/useCoursesApi"
@@ -26,9 +24,6 @@ export function Courses() {
   })
   const [showCreateModal, setShowCreateModal] = useState(false)
 
-  // Mock user ID - in real app this would come from auth context
-
-  // API hooks
   const {
     data: coursesResponse,
     isLoading: coursesLoading,
@@ -36,21 +31,16 @@ export function Courses() {
     refetch: refetchCourses,
   } = useCourses()
 
-  //const { data: categories = [], isLoading: categoriesLoading } = useCategories(userId)
-
-  // define data
   const courses = coursesResponse?.data ?? []
   const categories: Category[] = []
   const categoriesLoading = false
 
-  // Store actions
-  const { removeCourse, updateCourse } = useCourseStore()
 
-  // Filter and sort courses
+  useCourseStore()
+
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses as Course[]
 
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
@@ -61,19 +51,16 @@ export function Courses() {
       )
     }
 
-    // Apply category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((course) => selectedCategories.includes(course.categoryId))
     }
 
-    // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       const { field, order } = sortOption
 
       let aValue: any = a[field]
       let bValue: any = b[field]
 
-      // Handle different field types
       if (field === "createdAt") {
         aValue = new Date(aValue || 0).getTime()
         bValue = new Date(bValue || 0).getTime()
@@ -95,29 +82,12 @@ export function Courses() {
     return sorted
   }, [courses, searchQuery, selectedCategories, sortOption])
 
-  // Event handlers
   const handleCourseClick = (course: Course) => {
     navigate(`/courses/${course.id}`)
   }
 
-  const handleCourseEdit = (course: Course) => {
-    // Navigate to edit page or open edit modal
-    navigate(`/courses/${course.id}/edit`)
-  }
-
-  const handleCourseDelete = async (course: Course) => {
-    if (window.confirm(`Are you sure you want to delete "${course.title}"?`)) {
-      try {
-        await removeCourse(course.id)
-        refetchCourses()
-      } catch (error) {
-        console.error("Failed to delete course:", error)
-      }
-    }
-  }
 
   const handleCreateCategory = () => {
-    // This will be handled by the CreateCourseModal
     setShowCreateModal(true)
   }
 
@@ -125,7 +95,6 @@ export function Courses() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Header Section */}
       <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
           <h1 className="text-[var(--font-size-3xl)] font-bold text-[var(--color-text-primary)] mb-2">My Courses</h1>
@@ -135,14 +104,12 @@ export function Courses() {
         <CreateCourseButton onClick={() => setShowCreateModal(true)} disabled={isLoading} />
       </div>
 
-      {/* Stats Section */}
       {!isLoading && courses.length > 0 && (
         <div className="mb-8">
           <CourseStats courses={courses as Course[]} categories={categories as Category[]} />
         </div>
       )}
 
-      {/* Filters and Search Section */}
       <div className="mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
           <div className="w-full sm:max-w-md">
@@ -161,15 +128,11 @@ export function Courses() {
         <CourseSortDropdown selectedSort={sortOption} onSortChange={setSortOption} />
       </div>
 
-      {/* Course Grid */}
       <CourseGrid
         courses={filteredAndSortedCourses}
         isLoading={isLoading}
         error={coursesError?.message || null}
         onCourseClick={handleCourseClick}
-        onCourseEdit={handleCourseEdit}
-        onCourseDelete={handleCourseDelete}
-        showActions={true}
         emptyMessage={
           searchQuery || selectedCategories.length > 0
             ? "No courses match your filters"
@@ -178,12 +141,11 @@ export function Courses() {
         onRetry={refetchCourses}
       />
 
-      {/* Create Course Modal */}
-      {/* <CreateCourseModal
+      <CreateCourseModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         categories={categories}
-      /> */}
+      />
     </div>
   )
 }

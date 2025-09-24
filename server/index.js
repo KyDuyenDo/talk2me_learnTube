@@ -32,7 +32,7 @@ app.use(cookieParser());
 app.use(fileUpload());
 app.use(express.static("client"));
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5174"];
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
 
 app.use(cors({
   origin: function (origin, callback) {

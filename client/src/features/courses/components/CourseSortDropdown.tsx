@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FunctionComponent } from "react"
-// import { ChevronDown, SortAscIcon, SortDescIcon } from "../../../utils/constant/icon"
+import { ChevronDown } from "../../../utils/constant/icon"
 
 export type SortOption = {
   value: string
@@ -54,7 +54,7 @@ export const CourseSortDropdown: FunctionComponent<CourseSortDropdownProps> = ({
       >
         {selectedSort.order === "asc" ? <div>🔼</div> : <div>🔽</div>}
         <span className="text-[var(--font-size-sm)] font-medium">{selectedSort.label}</span>
-        <div className={`w-4 h-4 transition-transform ${showDropDown ? "rotate-180" : ""}`}>▼</div>
+        <ChevronDown className={`w-4 h-4 transition-transform ${showDropDown ? "rotate-180" : ""}`}/>
       </button>
 
       {showDropDown && (

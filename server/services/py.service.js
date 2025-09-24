@@ -2,7 +2,7 @@ const axios = require("axios");
 
 async function fetchExternalCourseInfo(youtubeUrl) {
     const res = await axios.post(
-        "http://127.0.0.1:5000/api/generate/info",
+        "http://127.0.0.1:5000/api/generate/youtube-info",
         { youtubeUrl },
         {
             headers: {

@@ -22,6 +22,11 @@ const courseSchema = new Schema({
         required: true,
         trim: true
     },
+    channel: {
+        type: String,
+        required: true,
+        trim: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
