@@ -6,31 +6,41 @@ type LoginInput = FormData
 
 type LoginResponse = {
     error: string | null;
-    data:{
-        accessToken: string | undefined
+    data: {
+        accessToken: string | null 
     };
-} | undefined
+} | undefined | null
 
 export function useLogin() {
+    const { setAccessToken, redirectPath, setRedirectPath } = useUserStore();
     return useMutation<LoginResponse, Error, LoginInput>({
         mutationFn: loginUser,
         onSuccess: (data) => {
-            if(data?.error) return;
-            useUserStore.setState({ user: null, accessToken: data?.data?.accessToken })
-            window.location.href = "/"
+            if (data?.error) {
+                return
+            }else if(data?.data){
+                setAccessToken(data?.data.accessToken)
+            }
+            // Điều hướng
+            if (redirectPath) {
+                window.location.href = redirectPath; // về lại trang trước đó
+                setRedirectPath(null); // reset để lần sau ko bị dính
+            } else {
+                window.location.href = "/"; // fallback mặc định
+            }
         },
         onError: (error) => {
-            console.log(error)
+            console.error(error);
             return error.message;
-        }
-    })
+        },
+    });
 }
 
 export function useRegister() {
     return useMutation<LoginResponse, Error, LoginInput>({
         mutationFn: registerUser,
         onSuccess: (data) => {
-            if(data?.error) return;
+            if (data?.error) return;
             window.location.href = "/login"
         },
         onError: (error) => {
@@ -40,11 +50,12 @@ export function useRegister() {
     })
 }
 
-export function useLogout(){
+export function useLogout() {
+    const { setLogout } = useUserStore()
     return useMutation({
         mutationFn: logout,
         onSuccess() {
-            useUserStore.setState({user: null, accessToken: null})
+            setLogout()
             window.onload
         },
     })

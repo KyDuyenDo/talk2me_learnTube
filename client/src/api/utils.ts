@@ -40,11 +40,12 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const { setLogout } = useUserStore()
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (originalRequest.url.includes("/api/user/refresh")) {
         // nếu refresh cũng 401 => logout luôn
-        useUserStore.setState({ accessToken: null });
+        setLogout()
         window.location.href = "/login";
         return Promise.reject(error);
       }
@@ -76,7 +77,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        useUserStore.setState({ accessToken: null });
+        setLogout()
         window.location.href = "/login";
         return Promise.reject(err);
       } finally {
@@ -85,6 +86,7 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 403) {
+      setLogout()
       window.location.href = "/login";
     }
 
