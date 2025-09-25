@@ -6,13 +6,19 @@ import {
     LogoutIcon,
     LanguageIcon,
 } from "../../../assets/icons";
-import { useState } from "react";
-import { useLogout } from "../../../hooks/useAuth";
+import { useEffect, useState } from "react";
+import { useLogout, useUser } from "../../../hooks/useAuth";
+
 
 export default function Account() {
     const logoutMutation = useLogout()
+    const user = useUser()
     const [open, setOpen] = useState(false);
     const [openChange, setOpenChange] = useState(false);
+
+    useEffect(()=>{
+        user.mutate()
+    },[])
 
     const handleLogout = async () => {
         logoutMutation.mutate()
@@ -40,7 +46,7 @@ export default function Account() {
             icon: <LogoutIcon />,
             title: "Logout",
             description: "Logout from your account",
-            onClick: handleLogout, // ✅ viết đúng
+            onClick: handleLogout, 
         },
     ];
 

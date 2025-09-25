@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query'
-import { loginUser, logout, registerUser } from '../features/auth/api/auth.service'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { getInforUser, loginUser, logout, registerUser } from '../features/auth/api/auth.service'
 import { useUserStore } from '../store/useUserStore'
 
 type LoginInput = FormData
@@ -7,19 +7,23 @@ type LoginInput = FormData
 type LoginResponse = {
     error: string | null;
     data: {
-        accessToken: string | null 
+        accessToken: string | null
     };
 } | undefined | null
 
+
+
 export function useLogin() {
     const { setAccessToken, redirectPath, setRedirectPath } = useUserStore();
+    const queryClient = useQueryClient()
     return useMutation<LoginResponse, Error, LoginInput>({
         mutationFn: loginUser,
         onSuccess: (data) => {
             if (data?.error) {
                 return
-            }else if(data?.data){
+            } else if (data?.data) {
                 setAccessToken(data?.data.accessToken)
+                queryClient.invalidateQueries({ queryKey: ["user"] });
             }
             // Điều hướng
             if (redirectPath) {
@@ -58,5 +62,21 @@ export function useLogout() {
             setLogout()
             window.onload
         },
+    })
+}
+
+export function useUser(){
+    const {setUser} = useUserStore()
+    return useMutation({
+        mutationFn: getInforUser,
+        onSuccess(data){
+            if(data){
+                setUser({
+                    id: data?.data.id,
+                    name: data?.data.username,
+                    email: data?.data.email
+                })
+            }
+        }
     })
 }

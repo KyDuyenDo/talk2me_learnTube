@@ -125,10 +125,80 @@ const getInfoUser = async (req, res, next) => {
     }
 };
 
+const changeInfo = async (req, res, next) => {
+    try {
+        const reqUser = req.user; // user id từ middleware
+        const { name, email } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            reqUser.id,
+            { name, email },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({
+            user: {
+                id: updatedUser._id,
+                username: updatedUser.name,
+                email: updatedUser.email,
+            },
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const changePassWord = async (req, res, next) => {
+    try {
+        const reqUser = req.user;
+        const { oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(reqUser.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Old password is incorrect" });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        return res.status(200).json({ message: "Password changed successfully" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const deleteUser = async (req, res, next) => {
+    try {
+        const reqUser = req.user;
+        const user = await User.findByIdAndDelete(reqUser.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: "User deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 module.exports = {
     signIn,
     logOut,
     refresh,
     createUser,
     getInfoUser,
+    changePassWord,
+    changeInfo,
+    deleteUser,
 };

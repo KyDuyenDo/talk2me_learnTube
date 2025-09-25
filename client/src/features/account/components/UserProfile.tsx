@@ -6,7 +6,8 @@ import {
     TrashIcon,
     ArrowLeftIcon,
 } from "../../../assets/icons";
-import { getInforUser } from "../../auth/api/auth.service";
+import { useUserStore } from "../../../store/useUserStore";
+import { changeInfoUser } from "../hook/useAccount";
 
 type ProfileProps = {
     onOpen: boolean;
@@ -14,22 +15,31 @@ type ProfileProps = {
 };
 
 export default function UserProfile({ onOpen, onClose }: ProfileProps) {
-    const [user, setUser] = useState({
-        name: "John Doe",
-        email: "john@example.com",
+    const { mutate: updateUser } = changeInfoUser()
+    const { user, setUser } = useUserStore()
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({
+        name: user?.name,
+        email: user?.email
     });
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState(user);
+    useEffect(() => {
+        setFormData({
+            name: user?.name,
+            email: user?.email
+        });
+    }, [user]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSave = () => {
-        setUser(formData);
-        setIsEditing(false);
-        // TODO: Gọi API update profile
+        const reqFormData = new FormData();
+        if (formData?.name) reqFormData.append("name", formData.name);
+        if (formData?.email) reqFormData.append("email", formData.email);
+        updateUser(reqFormData);
+        setIsEditing(false)
     };
 
     const handleDelete = () => {
@@ -38,21 +48,6 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
             console.log("Account deleted");
         }
     };
-
-    const fetchInforUser = async () => {
-        try{
-            const req = await getInforUser()
-            if(req?.data){
-                setUser(req.data)
-            }
-        }catch(err){
-            console.log(err)
-        }
-    }
-
-    useEffect(()=>{
-        fetchInforUser()
-    },[])
 
     return (
         <div
@@ -76,7 +71,7 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
                 <div className="rounded-lg border p-4 space-y-3">
                     {/* Name */}
                     <div className="flex items-center gap-3">
-                        <ProfileIcon  />
+                        <ProfileIcon />
                         {isEditing ? (
                             <input
                                 type="text"
@@ -86,13 +81,13 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
                                 className="border rounded px-3 py-1 w-full"
                             />
                         ) : (
-                            <p className="font-medium">{user.name}</p>
+                            <p className="font-medium">{user?.name}</p>
                         )}
                     </div>
 
                     {/* Email */}
                     <div className="flex items-center gap-3">
-                        <MailIcon  />
+                        <MailIcon />
                         {isEditing ? (
                             <input
                                 type="email"
@@ -102,7 +97,7 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
                                 className="border rounded px-3 py-1 w-full"
                             />
                         ) : (
-                            <p className="text-gray-600">{user.email}</p>
+                            <p className="text-gray-600">{user?.email}</p>
                         )}
                     </div>
 
@@ -128,7 +123,7 @@ export default function UserProfile({ onOpen, onClose }: ProfileProps) {
                                 onClick={() => setIsEditing(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
                             >
-                                
+
                                 Edit Info
                             </button>
                         )}
