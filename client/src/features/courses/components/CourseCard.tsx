@@ -1,5 +1,3 @@
-"use client"
-
 import type { FunctionComponent } from "react"
 import type { Course } from "../../../store/courseStore"
 
