@@ -30,7 +30,7 @@ function Search({ className, onSearch, onChange, ...props }: SearchProps) {
   const inputClasses = [
     "flex h-9 w-full min-w-0 rounded-md border-2 border-gray-300 bg-transparent pl-9 pr-3 py-1 text-base transition-colors outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
     "placeholder:text-gray-500",
-    "focus:border-gray-300", // Keep same gray border on focus
+    "focus:border-gray-300",
     className,
   ]
     .filter(Boolean)

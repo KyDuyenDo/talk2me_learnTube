@@ -66,7 +66,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
-            <h2 className="text-[var(--font-size-xl)] font-semibold text-[var(--color-text-primary)]">{title}</h2>
+            <h2 className="text-[length:var(--font-size-xl)] font-semibold text-[var(--color-text-primary)]">{title}</h2>
             {showCloseButton && (
               <button
                 onClick={onClose}
