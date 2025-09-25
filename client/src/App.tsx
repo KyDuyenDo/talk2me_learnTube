@@ -11,8 +11,6 @@ import LoginPage from "./features/auth/pages/Login"
 import AccountPage from "./features/account/page/Account"
 import { Courses } from "./features/courses/pages/Courses"
 import QuizPage from "./features/question/pages/Quiz"
-import { useUserStore } from './store/useUserStore';
-import { Navigate, Outlet } from "react-router-dom";
 
 function App() {
   return (
@@ -21,13 +19,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/report" element={<QuizResults />} />
-              <Route path="/account" element={<AccountPage />} />
-            </Route>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/report" element={<QuizResults />} />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
           <Route path="/courses/:id/quiz" element={<QuizPage />} />
@@ -38,9 +34,3 @@ function App() {
 }
 
 export default App
-
-
-export function ProtectedRoute() {
-  const { accessToken } = useUserStore();
-  return accessToken ? <Outlet /> : <Navigate to="/login" replace />;
-}

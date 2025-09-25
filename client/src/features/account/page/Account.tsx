@@ -1,33 +1,48 @@
-import UserProfile from "../components/UserProfile"
+import UserProfile from "../components/UserProfile";
 import ChangePasswordSidebar from "../components/ChangePassWord";
 import {
     ProfileIcon,
     LockIcon,
     LogoutIcon,
-    LanguageIcon
+    LanguageIcon,
 } from "../../../assets/icons";
 import { useState } from "react";
-import { logout } from "../../auth/api/auth.service";
-// Định nghĩa kiểu cho icon name
-
+import { useLogout } from "../../../hooks/useAuth";
 
 export default function Account() {
+    const logoutMutation = useLogout()
     const [open, setOpen] = useState(false);
-    const [openChange,setOpenChange] = useState(false)
+    const [openChange, setOpenChange] = useState(false);
 
     const handleLogout = async () => {
-        alert("logout")
-        await logout()
-    }
-    
+        logoutMutation.mutate()
+    };
+
     const items = [
-        { icon: <ProfileIcon />, title: "Profile", description: "Manage your profile details.",  onClick: () => setOpen(!open)},
-        { icon: <LanguageIcon/>, title: "Language", description: "Manage your account settings.", },
-        { icon: <LockIcon />, title: "Change password", description: "Manage your subscriptions.",  onClick: () => setOpenChange(!openChange)  },
-        { icon: <LogoutIcon/>, title: "Logout", description: "Logout from your account", onclick: handleLogout },
+        {
+            icon: <ProfileIcon />,
+            title: "Profile",
+            description: "Manage your profile details.",
+            onClick: () => setOpen((prev) => !prev),
+        },
+        {
+            icon: <LanguageIcon />,
+            title: "Language",
+            description: "Manage your account settings.",
+        },
+        {
+            icon: <LockIcon />,
+            title: "Change password",
+            description: "Manage your subscriptions.",
+            onClick: () => setOpenChange((prev) => !prev),
+        },
+        {
+            icon: <LogoutIcon />,
+            title: "Logout",
+            description: "Logout from your account",
+            onClick: handleLogout, // ✅ viết đúng
+        },
     ];
-
-
 
     return (
         <>
@@ -37,7 +52,7 @@ export default function Account() {
                     <div
                         key={item.title}
                         onClick={item.onClick}
-                        className="relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 w-full my-5 border  rounded"
+                        className="relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 w-full my-5 border rounded"
                     >
                         {/* Icon */}
                         <div className="p-2 rounded-full bg-gray-100 text-gray-700">
@@ -46,16 +61,25 @@ export default function Account() {
 
                         {/* Text */}
                         <div>
-                            <div className="text-base font-medium text-gray-900">{item.title}</div>
+                            <div className="text-base font-medium text-gray-900">
+                                {item.title}
+                            </div>
                             {item.description && (
-                                <span className="text-sm text-gray-500">{item.description}</span>
+                                <span className="text-sm text-gray-500">
+                                    {item.description}
+                                </span>
                             )}
                         </div>
                     </div>
                 ))}
             </div>
-            <UserProfile onOpen={open} onClose = {()=>setOpen(!open)} />
-            <ChangePasswordSidebar onOpen={openChange} onClose = {()=>setOpenChange(!openChange)}/>
+
+            {/* Sidebars */}
+            <UserProfile onOpen={open} onClose={() => setOpen(false)} />
+            <ChangePasswordSidebar
+                onOpen={openChange}
+                onClose={() => setOpenChange(false)}
+            />
         </>
     );
 }
