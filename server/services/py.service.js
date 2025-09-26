@@ -15,6 +15,8 @@ async function fetchExternalCourseInfo(youtubeUrl) {
     return {
         title: res.data.title,
         thumbnail: res.data.thumbnail,
+        transcript: res.data.transcript,
+        channel: res.data.channel
     };
 }
 
@@ -32,4 +34,18 @@ async function fetchQuestionsFromAI(youtubeUrl) {
     return res.data.questions;
 }
 
-module.exports = { fetchExternalCourseInfo, fetchQuestionsFromAI };
+async function fetchQuizTheoryFromAI(transcript) {
+    const res = await axios.post(
+        "http://127.0.0.1:5000/api/generate/theory/quiz",
+        { transcript },
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "X-API-KEY": "12345",
+            },
+        }
+    );
+    return res.data.questions;
+}
+
+module.exports = { fetchExternalCourseInfo, fetchQuestionsFromAI, fetchQuizTheoryFromAI };

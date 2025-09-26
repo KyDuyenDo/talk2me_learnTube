@@ -11,3 +11,26 @@ export interface VideoInfo {
   channel: string
   thumbnail: string
 }
+
+export interface Course {
+  _id: string
+  title: string
+  description?: string
+  youtubeUrl: string
+  thumbnail: string
+  channel: string
+  categoryId: string
+  userId?: string
+  createdAt?: string
+  updatedAt?: string
+  isCompleted?: boolean
+  progress?: number
+}
+
+export interface Category {
+  id: string
+  name: string
+  userId: string
+  createdAt: string
+  courseCount?: number
+}

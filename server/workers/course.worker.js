@@ -1,4 +1,4 @@
-const { courseQueue, questionQueue } = require("../queue/courseQueue");
+const { courseQueue, questionQueue, lessonQueue } = require("../queue/courseQueue");
 const Course = require("../models/course");
 const { createLessonParts } = require("../services/lessonPartService");
 const { fetchExternalCourseInfo } = require("../services/py.service");
@@ -8,36 +8,53 @@ courseQueue.process("createCourse", async (job) => {
   const { courseData, socketId } = job.data;
   const io = getIO();
 
+  const session = await Course.startSession();
+  session.startTransaction();
+
   try {
+  
     const externalCourseInfo = await fetchExternalCourseInfo(courseData.youtubeUrl);
 
-    const newCourse = await Course.create({
-      ...courseData,
-      ...externalCourseInfo,
-    });
+    const [newCourse] = await Course.create(
+      [{ ...courseData, ...externalCourseInfo }],
+      { session }
+    );
 
     io.to(socketId).emit("courseCreated", { course: newCourse });
 
-    const lessonParts = await createLessonParts(newCourse._id);
+    const lessonParts = await createLessonParts(newCourse._id, session);
 
-    io.to(socketId).emit("lessonPartsCreated", { lessonParts });
+    io.to(socketId).emit("createTheory", { lessonParts });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    await lessonQueue.add(
+      "createTheory",
+      { lessonParts, transcript: externalCourseInfo.transcript },
+      { attempts: 3, backoff: { type: "fixed", delay: 5000 } }
+    );
 
     for (const part of lessonParts) {
       if (part.type === "quiz") {
-        try {
-          await questionQueue.add("generateQuestions", {
+        await questionQueue.add(
+          "generateQuestions",
+          {
             lessonPartId: part._id,
             youtubeUrl: courseData.youtubeUrl,
             socketId,
-          });
-        } catch (quizJobError) {
-          console.error(`Failed to add generateQuestions job for lessonPartId ${part._id}`, quizJobError);
-        }
+          },
+          { attempts: 3, backoff: { type: "exponential", delay: 3000 } }
+        );
       }
     }
 
     return { courseId: newCourse._id };
   } catch (error) {
+   
+    await session.abortTransaction();
+    session.endSession();
+
     console.error("Failed to create course:", error);
     throw error;
   }

@@ -77,6 +77,41 @@ class QuestionGenerator:
               "referenceAnswer": "..."
             }
             Return at least 5 tasks.
+            """,
+            "quiz_theory": """ 
+                You are an English learning assistant. 
+                You will be given a long transcript from a YouTube video. 
+                Your job is NOT to summarize everything, but to extract only the **most useful and interesting English phrases, idioms, and expressions** for learners. 
+
+                Rules:
+                1. Select only the BEST phrases (about 10–20), not everything. 
+                - Priority: phrases that are natural, conversational, or expressive. 
+                - Skip filler words or basic vocabulary.
+                2. Organize them into clear groups (e.g., “Phrases to describe…”, “Vocabulary to describe…”, “Expressing emotions…”).
+                3. For each phrase:
+                - Show the phrase in [brackets].
+                - Give a short learner-friendly explanation (English only, simple).
+                - Give 1 short example sentence.
+                4. Highlight idioms, phrasal verbs, and common collocations.
+                5. Keep output concise, beautiful, and easy to review (Markdown format).
+
+                Output example:
+
+                ## Phrases to describe your dream home
+                - I’m looking to [upgrade the family home]. → to buy a better/newer house.  
+                *Example*: We’re looking to upgrade the family home next year.
+
+                - I’m hoping to stay under [200,000 dollars], but I could stretch it.  
+                *To stretch* = to increase your budget.  
+                *Example*: I wanted to spend $100, but I stretched my budget to $120.
+
+                ## Vocabulary to describe spaces
+                - [Cosy] = small, comfortable, and warm.  
+                *Example*: The room feels cosy with the fireplace.
+
+                ## Expressing opinion and emotions
+                - [It blew my mind] = something was very exciting or unusual.  
+                *Example*: The concert last night blew my mind.
             """
         }
 
@@ -103,6 +138,19 @@ class QuestionGenerator:
             response_format=List[OpenQuestion]
         )
         return response.choices[0].message.parsed
+    
+    def generate_quiz_theory(self,  transcript_text: str) -> str:
+        messages = [
+            {"role": "system", "content": self.prompts["quiz_theory"]},
+            {"role": "user", "content": transcript_text}
+        ]
+        response = self.client.chat.completions.parse(
+            model="deepseek/deepseek-r1:free",
+            messages=messages,
+        )
+        return response.choices[0].message.parsed
+
+        
 
     def to_node_format_quiz(self, quizset: QuizSet):
         quiz_questions = []

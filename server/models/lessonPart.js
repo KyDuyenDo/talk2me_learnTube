@@ -14,6 +14,10 @@ const lessonPartSchema = new Schema({
         enum: ['quiz', 'writing', 'speaking'],
         trim: true
     },
+    theory: {
+        type: String,
+        required: true,
+    },
     completed: {
         type: Boolean,
         default: false

@@ -7,4 +7,9 @@ const questionQueue = new Queue("question", {
   redis: { host: "127.0.0.1", port: 6379 },
 });
 
-module.exports = { courseQueue, questionQueue };
+const lessonQueue = new Queue("lesson", {
+  redis: { host: "127.0.0.1", port: 6379 },
+});
+
+
+module.exports = { courseQueue, questionQueue, lessonQueue };

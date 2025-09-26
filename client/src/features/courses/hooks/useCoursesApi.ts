@@ -1,8 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useCourseStore } from "../../../store/courseStore"
-
 import { categoryApi, courseApi, youtubeApi } from "../api/courseApi"
-import { useEffect } from "react"
 
 // Query keys
 export const courseKeys = {
@@ -30,24 +27,16 @@ export const useCourses = (
     sortOrder?: "asc" | "desc"
   },
 ) => {
-  const { setCourses } = useCourseStore()
   const query = useQuery({
     queryKey: courseKeys.list(params),
     queryFn: () => courseApi.getCourses(params),
     staleTime: 1000 * 60 * 5,
   })
 
-  useEffect(() => {
-    if (query.data) {
-      setCourses(query.data.data)
-    }
-  }, [query.data, setCourses])
-
   return query
 }
 
 export const useCourse = (courseId: string) => {
-  const { setSelectedCourse } = useCourseStore()
 
   const query = useQuery({
     queryKey: courseKeys.detail(courseId),
@@ -56,17 +45,10 @@ export const useCourse = (courseId: string) => {
     staleTime: 1000 * 60 * 2,
   })
 
-  useEffect(() => {
-    if (query.data) {
-      setSelectedCourse(query.data)
-    }
-  }, [query.data, setSelectedCourse])
-
-  return
+  return query
 }
 
 export const useCategories = () => {
-  const { setCategories } = useCourseStore()
 
   const query = useQuery({
     queryKey: categoryKeys.list(),
@@ -74,26 +56,17 @@ export const useCategories = () => {
     staleTime: 1000 * 60 * 10,
   })
 
-  useEffect(() => {
-    if (query.data) {
-      setCategories(query.data)
-    }
-  }, [query.data, setCategories])
-
   return query
 }
 
 // Mutation hooks POST
 export const useCreateCourse = () => {
   const queryClient = useQueryClient()
-  const { addCourse, setCreateModalOpen } = useCourseStore()
 
   return useMutation({
     mutationFn: courseApi.createCourse,
-    onSuccess: (newCourse) => {
-      addCourse(newCourse)
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
-      setCreateModalOpen(false)
     },
   })
 }
@@ -101,13 +74,11 @@ export const useCreateCourse = () => {
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient()
-  const { removeCourse } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ courseId, }: { courseId: string; }) =>
       courseApi.deleteCourse(courseId,),
-    onSuccess: (_, { courseId }) => {
-      removeCourse(courseId)
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
     },
   })
@@ -115,14 +86,12 @@ export const useDeleteCourse = () => {
 
 export const useUpdateProgress = () => {
   const queryClient = useQueryClient()
-  const { updateCourse } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ courseId, progress }: { courseId: string; progress: number }) =>
       courseApi.updateProgress(courseId, progress),
     onSuccess: (updatedCourse) => {
-      updateCourse(updatedCourse.id, { progress: updatedCourse.progress, isCompleted: updatedCourse.isCompleted })
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse.id) })
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse._id) })
     },
   })
 }
@@ -130,12 +99,10 @@ export const useUpdateProgress = () => {
 // Category mutation hooks
 export const useCreateCategory = () => {
   const queryClient = useQueryClient()
-  const { addCategory } = useCourseStore()
 
   return useMutation({
     mutationFn: categoryApi.createCategory,
-    onSuccess: (newCategory) => {
-      addCategory(newCategory)
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
     },
   })
@@ -143,13 +110,11 @@ export const useCreateCategory = () => {
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient()
-  const { removeCategory } = useCourseStore()
 
   return useMutation({
     mutationFn: ({ categoryId, }: { categoryId: string; }) =>
       categoryApi.deleteCategory(categoryId,),
-    onSuccess: (_, { categoryId }) => {
-      removeCategory(categoryId)
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
       queryClient.invalidateQueries({ queryKey: courseKeys.all })
     },
