@@ -6,7 +6,7 @@ const authInterceptor = (req: any) => {
     //const token = JSON.parse(localStorage.getItem('profile') || "")?.accessToken;
     // if (token) {
     // }
-    req.headers['Authorization'] = `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2JjMTgxMjFlMmFiMjgxY2NkZDdiNSIsImVtYWlsIjoiZHV5ZW5rMjAwQGdtYWlsLmNvbSIsImlhdCI6MTc1ODY3Nzg0NCwiZXhwIjoxNzU4Njk5NDQ0fQ.c-vN-5uDnPHa1yNUPDU6LAE4eoY84-SyorxtoHxDnOA'}`;
+    req.headers['Authorization'] = `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2JjMTgxMjFlMmFiMjgxY2NkZDdiNSIsImVtYWlsIjoiZHV5ZW5rMjAwQGdtYWlsLmNvbSIsImlhdCI6MTc1ODg0ODAzNywiZXhwIjoxNzU4ODY5NjM3fQ.CC4nKgvRVe-v-XX8BsvxRXlV_t88oTViQo0IC44LJ2Y'}`;
     return req;
 }
 

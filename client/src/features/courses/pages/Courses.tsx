@@ -1,16 +1,14 @@
 import { useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { useCourses, useCategories } from "../hooks/useCoursesApi"
-import { useCourseStore } from "../../../store/courseStore"
+import { useCourses } from "../hooks/useCoursesApi"
 
 import { CourseSearch } from "../components/CourseSearch"
 import { CategoryFilter } from "../components/CategoryFilter"
 import { CourseSortDropdown, type SortOption } from "../components/CourseSortDropdown"
-import { CourseStats } from "../components/CourseStats"
 import { CreateCourseModal } from "../components/CreateCourseModal"
 import { CreateCourseButton } from "../components/CreateCourseButton"
-import type { Category, Course } from "../../../store/courseStore"
 import CourseGrid from "../components/CourseGrid"
+import type { Category, Course } from "../types"
 
 export function Courses() {
   const navigate = useNavigate()
@@ -34,9 +32,6 @@ export function Courses() {
   const courses = coursesResponse?.data ?? []
   const categories: Category[] = []
   const categoriesLoading = false
-
-
-  useCourseStore()
 
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses as Course[]

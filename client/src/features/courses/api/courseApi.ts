@@ -1,5 +1,5 @@
-import type { Category, Course } from "../../../store/courseStore";
 import { api } from "../../../api/utils";
+import type { Category, Course } from "../types";
 
 interface ApiResponse<T> {
   success: boolean;
