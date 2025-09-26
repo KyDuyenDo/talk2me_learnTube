@@ -2,7 +2,8 @@ import type { FunctionComponent } from "react"
 import { CourseCard } from "./CourseCard"
 import LoadingSpinner from "../../../components/LoadingSpinner"
 import ErrorMessage from "../../../components/ErrorMessage"
-import type { Course } from "../../../store/courseStore"
+import type { Course } from "../types"
+
 
 interface CourseGridProps {
   courses: Course[]
@@ -74,7 +75,7 @@ export const CourseGrid: FunctionComponent<CourseGridProps> = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {courses.map((course) => (
         <CourseCard
-          key={course.id}
+          key={course._id}
           course={course}
           onClick={() => onCourseClick?.(course)}
         />

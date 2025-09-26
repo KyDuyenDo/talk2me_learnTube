@@ -91,7 +91,7 @@ export const useUpdateProgress = () => {
     mutationFn: ({ courseId, progress }: { courseId: string; progress: number }) =>
       courseApi.updateProgress(courseId, progress),
     onSuccess: (updatedCourse) => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse.id) })
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(updatedCourse._id) })
     },
   })
 }

@@ -78,7 +78,7 @@ export function Courses() {
   }, [courses, searchQuery, selectedCategories, sortOption])
 
   const handleCourseClick = (course: Course) => {
-    navigate(`/courses/${course.id}`)
+    navigate(`/courses/${course._id}`)
   }
 
 
