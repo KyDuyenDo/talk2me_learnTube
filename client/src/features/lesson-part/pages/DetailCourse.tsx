@@ -49,7 +49,7 @@ const CourseDetail: FunctionComponent<CourseDetailProps> = () => {
     )
   }
 
-  if (!lessonData || !Array.isArray(lessonData) || lessonData.length === 0) {
+  if (!lessonData || lessonData.length === 0) {
     return (
       <div className="min-h-screen bg-white px-7 py-8">
         <div className="p-3">
@@ -90,7 +90,7 @@ const CourseDetail: FunctionComponent<CourseDetailProps> = () => {
                 task={"2"}
                 theory={lesson.theory}
                 onClickResult={() => handleClickResult(lesson.type)}
-                onClickAccess={() => navigate("/courses/1212/quiz")}
+                onClickAccess={() => navigate(`/courses/${id}/quiz/${lesson._id}`)}
               />
             ))}
           </div>

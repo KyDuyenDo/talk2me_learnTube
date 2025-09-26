@@ -14,10 +14,10 @@ const api = axios.create({
 
 // Request Interceptor -> luôn attach token vào header
 api.interceptors.request.use((config) => {
-  const token = useUserStore.getState().accessToken;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // const token = useUserStore.getState().accessToken;
+  // if (token) {
+  // }
+  config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2JjMTgxMjFlMmFiMjgxY2NkZDdiNSIsImVtYWlsIjoiZHV5ZW5rMjAwQGdtYWlsLmNvbSIsImlhdCI6MTc1ODg3MDk0MCwiZXhwIjoxNzU4ODkyNTQwfQ.ZefDfn8H_uMaN5Hdz6UFLqayQf-DXv9Z7mEurw5lsms`;
   return config;
 });
 

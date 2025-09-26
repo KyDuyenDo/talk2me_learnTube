@@ -1,12 +1,76 @@
 import type { FunctionComponent } from "react"
 import type { YouTubeProps } from "react-youtube"
 import YouTube from "react-youtube"
+import { useQuestoinQuiz } from "../hooks/useQuestionApi"
+import { useNavigate, useParams } from "react-router-dom"
+import LoadingSpinner from "../../../components/LoadingSpinner"
+import ErrorMessage from "../../../components/ErrorMessage"
+import { LeftIcon } from "../../../utils/constant/icon"
+import { extractYouTubeVideoId } from "../../../utils/youtube"
 
 type QuizPageProps = {}
 
+export type Question = {
+  _id: string,
+  lessonPartId: string;
+  type: string;
+  order: number;
+  prompt: string;
+  choices?: string[];
+  correctIndex?: number;
+  referenceAnswer: string;
+  createdAt?: Date;
+};
+
 const QuizPage: FunctionComponent<QuizPageProps> = () => {
+  const { qid } = useParams()
+  const navigate = useNavigate()
+  const { data: data, error, isPending: isLoading, refetch: onRetry } = useQuestoinQuiz(qid || "")
+
+  const questions = data?.questions
+  const youtubeId = extractYouTubeVideoId(data?.youtubeUrl)
+
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <LoadingSpinner size="lg" className="text-[var(--color-primary)] mb-4" />
+          <p className="text-[var(--color-text-secondary)]">Loading lesson...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="py-8">
+        <ErrorMessage message={error.message} onRetry={onRetry} />
+      </div>
+    )
+  }
+
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-white px-7 py-8">
+        <div className="p-3">
+          <div className="flex justify-start">
+            <button onClick={() => navigate(-1)} className="flex">
+              <LeftIcon />
+              <span className="text-[length:var(--font-size-sm)] text-[var(--color-primary)]">Back</span>
+            </button>
+          </div>
+          <div className="pt-8 text-center">
+            <p className="text-[var(--color-text-secondary)]">No lessons available</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+
+
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
-    // access to player in all event handlers via event.target
     event.target.pauseVideo()
   }
 
@@ -14,10 +78,11 @@ const QuizPage: FunctionComponent<QuizPageProps> = () => {
     height: "360",
     width: "640",
     playerVars: {
-      // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
     },
   }
+
+
 
   return (
     <div className="h-screen bg-white flex flex-col">
@@ -61,7 +126,7 @@ const QuizPage: FunctionComponent<QuizPageProps> = () => {
               </h1>
               <div className="aspect-video w-full">
                 <YouTube
-                  videoId="d2B13zqKL1I"
+                  videoId={youtubeId || ""}
                   opts={{
                     ...opts,
                     width: "100%",
@@ -76,24 +141,20 @@ const QuizPage: FunctionComponent<QuizPageProps> = () => {
             {/* Questions section */}
             <div>
               <form className="space-y-6">
-                {[1, 2, 3, 4, 5, 6, 7].map((num, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                {questions.map((question: Question, index: number) => (
+                  <div key={question._id} className="bg-gray-50 p-4 rounded-lg">
                     <div className="mb-3 font-medium text-gray-900">
-                      {num}. Stephanie would be unhappy to stretch her budget.
+                      {index + 1}. {question.prompt}
                     </div>
                     <div className="space-y-2 pl-4">
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name={`question-${num}`} value="true" className="text-blue-600" />
-                        <span>True</span>
-                      </label>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name={`question-${num}`} value="false" className="text-blue-600" />
-                        <span>False</span>
-                      </label>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name={`question-${num}`} value="not-given" className="text-blue-600" />
-                        <span>Not Given</span>
-                      </label>
+                      {
+                        question.choices?.map((choice, index) => (
+                          <label className="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name={`${question._id}-${index}`} value="true" className="text-blue-600" />
+                            <span>{choice}</span>
+                          </label>
+                        ))
+                      }
                     </div>
                   </div>
                 ))}

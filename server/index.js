@@ -16,6 +16,7 @@ const courseRouter = require("./routes/course.route");
 const authRouter = require("./routes/user.route");
 const categoryRouter = require("./routes/category.route");
 const lessonPartRouter = require("./routes/lessonPart.route")
+const questionRouter = require("./routes/questions.route")
 
 // Socket
 const { initSocket } = require("./socket/course.socket");
@@ -54,6 +55,7 @@ app.use("/api/course", courseRouter);
 app.use("/api/user", authRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/lesson-part", lessonPartRouter);
+app.use("/api/question", questionRouter);
 
 
 // Create HTTP server for socket.io

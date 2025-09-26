@@ -26,7 +26,7 @@ function App() {
             <Route path="/account" element={<AccountPage />} />
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
-          <Route path="/courses/:id/quiz" element={<QuizPage />} />
+          <Route path="/courses/:id/quiz/:qid" element={<QuizPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
