@@ -5,6 +5,7 @@ async function createLessonParts(courseId) {
   const parts = ["quiz", "writing", "speaking"].map((type) => ({
     courseId,
     type,
+    theory: "",
     completed: false,
   }));
 
