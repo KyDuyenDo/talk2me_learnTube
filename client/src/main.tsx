@@ -6,8 +6,8 @@ import { QueryProvider } from './providers/QueryProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryProvider>
-      <App />
-    </QueryProvider>
+      <QueryProvider>
+        <App />
+      </QueryProvider>
   </StrictMode>,
 )

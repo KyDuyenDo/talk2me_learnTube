@@ -14,6 +14,9 @@ const Navbar: FunctionComponent = () => {
     }, {
         title: "Flash Card",
         link: "/flashcard"
+    }, {
+        title: "Account",
+        link: "/account"
     }]
     const location = useLocation();
     const currentPath = location.pathname;

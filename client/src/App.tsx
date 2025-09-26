@@ -8,6 +8,7 @@ import QuizResults from "./features/report/pages/Report"
 import DetailCourses from "./features/lesson-part/pages/DetailCourse"
 import RegisterPage from "./features/auth/pages/Register"
 import LoginPage from "./features/auth/pages/Login"
+import AccountPage from "./features/account/page/Account"
 import { Courses } from "./features/courses/pages/Courses"
 import QuizPage from "./features/question/pages/Quiz"
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/report" element={<QuizResults />} />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
           <Route path="/courses/:id" element={<DetailCourses />} />
           <Route path="/courses/:id/quiz" element={<QuizPage />} />
