@@ -16,7 +16,7 @@ const lessonPartSchema = new Schema({
     },
     theory: {
         type: String,
-        required: true,
+        default: "",
     },
     completed: {
         type: Boolean,

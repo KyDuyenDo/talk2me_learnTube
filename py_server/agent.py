@@ -1,9 +1,11 @@
+import json
 import os
 from datetime import datetime
 from typing import List, Literal, Optional
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
+from ollama import Client
 
 load_dotenv(override=True)
 
@@ -32,31 +34,44 @@ class QuestionGenerator:
         return cls._instance
 
     def _init_openai(self):
-        self.client = OpenAI(
+        self.openrouter_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=os.getenv("OPENAI_API_KEY")
+        )
+        self.ollama_client = Client(
+            host="https://ollama.com",
+            headers={'Authorization': os.getenv("OLLAMA_API_KEY")}
         )
 
         self.prompts = {
             "quiz": """
-                You are an AI English Teaching Assistant specializing in grammar and vocabulary.  
-                Your task: process English subtitles from a YouTube conversation and create a quiz.  
+                You are an AI English Test Question Generator.
+
+                Your task: From the given transcript or text, create a set of multiple-choice questions (MCQs) that test ONLY:
+                - English grammar (tenses, articles, prepositions, conjunctions, sentence structure, subject-verb agreement)
+                - Vocabulary (word meanings, synonyms, antonyms, phrasal verbs, collocations, idioms in context)
 
                 Instructions:
-                1. Focus ONLY on **English grammar** (tenses, articles, prepositions, sentence structure) and **vocabulary** (word meaning, collocations, phrasal verbs, synonyms/antonyms, usage).  
-                2. Each question must be in the style of **standard English test MCQs** (like TOEIC or IELTS).  
-                3. Do NOT create questions about culture, rhetorical devices, discourse analysis, or speaker intentions.  
-                4. Explanations must be clear, simple, and teacher-like.  
-                5. You MUST create at least 10 MCQs (preferably 12–15).  
+                1. Do NOT create questions about culture, background knowledge, or speaker intentions.
+                2. Follow the style of TOEIC/IELTS Part 5–6 grammar & vocabulary questions.
+                3. Each question must have exactly 4 options (A–D).
+                4. The field "correct_answer" must be exactly one of: "A", "B", "C", "D".
+                5. Provide a simple, teacher-like explanation.
+                6. Generate at least 10 MCQs.
 
-                Generate in this JSON format:
-                    {
-                        "question": "...",
-                        "options": ["option1", "option2", "option3", "option4"],
-                        "correct_answer": "the correct option (exact text from options)",
-                        "explanation": "clear explanation like a teacher"
-                    }
-                """,
+                ### Output strictly in JSON format (array of objects).
+                ### Do not include any extra text, comments, or markdown (no ```json, no explanations outside JSON).
+
+                Example format:
+                [
+                {
+                    "question": "Choose the correct verb form: She ___ to the office every day.",
+                    "options": ["go", "goes", "going", "gone"],
+                    "correct_answer": "B",
+                    "explanation": "With third-person singular subject 'she', the verb must be 'goes'."
+                }
+                ]
+            """,
             "writing": """
             You are an AI English Teacher.  
             Task: generate writing practice questions.  
@@ -118,37 +133,51 @@ class QuestionGenerator:
     def generate_quiz(self, transcript_text: str) -> QuizSet:
         messages = [
             {"role": "system", "content": self.prompts["quiz"]},
-            {"role": "user", "content": transcript_text}
+            {"role": "user", "content": transcript_text},
         ]
-        response = self.client.chat.completions.parse(
-            model="deepseek/deepseek-r1:free",
-            messages=messages,
-            response_format=QuizSet
-        )
-        return response.choices[0].message.parsed
+
+        response = self.ollama_client.chat("gpt-oss:120b", messages=messages)
+
+        content = response["message"]["content"]
+
+        try:
+            data = json.loads(content)
+            quiz = QuizSet(questions=data)
+            return quiz
+        except Exception as e:
+            raise ValueError(f"Lỗi parse QuizSet: {e}\nRaw content: {content}")
+        
 
     def generate_open_questions(self, text: str, task_type: str) -> List[OpenQuestion]:
         messages = [
             {"role": "system", "content": self.prompts[task_type]},
             {"role": "user", "content": text}
         ]
-        response = self.client.chat.completions.parse(
+        response = self.openrouter_client.chat.completions.parse(
             model="deepseek/deepseek-r1:free",
             messages=messages,
             response_format=List[OpenQuestion]
         )
         return response.choices[0].message.parsed
     
-    def generate_quiz_theory(self,  transcript_text: str) -> str:
+    def generate_quiz_theory(self, transcript_text: str) -> str:
         messages = [
             {"role": "system", "content": self.prompts["quiz_theory"]},
             {"role": "user", "content": transcript_text}
         ]
-        response = self.client.chat.completions.parse(
-            model="deepseek/deepseek-r1:free",
-            messages=messages,
+
+        response = self.ollama_client.chat(
+            "gpt-oss:120b",
+            messages=messages
         )
-        return response.choices[0].message.parsed
+
+        return response["message"]["content"]
+
+        # response = self.client.chat.completions.parse(
+        #     model="deepseek/deepseek-r1:free",
+        #     messages=messages,
+        # )
+        # return response.choices[0].message.content
 
         
 

@@ -14,6 +14,7 @@ courseQueue.process("createCourse", async (job) => {
   try {
   
     const externalCourseInfo = await fetchExternalCourseInfo(courseData.youtubeUrl);
+    console.log(externalCourseInfo)
 
     const [newCourse] = await Course.create(
       [{ ...courseData, ...externalCourseInfo }],
@@ -32,7 +33,7 @@ courseQueue.process("createCourse", async (job) => {
     await lessonQueue.add(
       "createTheory",
       { lessonParts, transcript: externalCourseInfo.transcript },
-      { attempts: 3, backoff: { type: "fixed", delay: 5000 } }
+      // { attempts: 3, backoff: { type: "fixed", delay: 5000 } }
     );
 
     for (const part of lessonParts) {
@@ -44,7 +45,7 @@ courseQueue.process("createCourse", async (job) => {
             youtubeUrl: courseData.youtubeUrl,
             socketId,
           },
-          { attempts: 3, backoff: { type: "exponential", delay: 3000 } }
+          // { attempts: 3, backoff: { type: "exponential", delay: 3000 } }
         );
       }
     }

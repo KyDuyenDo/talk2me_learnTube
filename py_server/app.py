@@ -31,16 +31,26 @@ def check_api_key():
     if key != os.getenv("PRIVATE_API_KEY"):
         abort(403, description="Forbidden: Invalid API key")
 
-@api_generate.route("/quiz", methods=["POST"])
+@api_generate.route('/quiz', methods=["POST"])
 def generate_quiz():
-    data = request.get_json() or {}
+    data = request.get_json() or {}  
     youtube_url = data.get("youtubeUrl", "").strip()
+    
     if not youtube_url:
         return jsonify({"error": "youtubeUrl is required"}), 400
 
-    transcript = get_transcript(youtube_url, max_minutes=10)
+    if "v=" in youtube_url:
+        youtube_id = youtube_url.split("v=")[1].split("&")[0]
+    elif "youtu.be/" in youtube_url:
+        youtube_id = youtube_url.split("youtu.be/")[1].split("?")[0]
+    else:
+        return jsonify({"error": "Invalid YouTube URL"}), 400
+
+    transcript = get_transcript(youtube_id, 10)
+    
     quizset = gen.generate_quiz(transcript)
     quiz_nodes = gen.to_node_format_quiz(quizset)
+    
 
     return jsonify({"message": "Received", "questions": quiz_nodes})
 
@@ -59,20 +69,30 @@ def get_info_youtubeUrl():
     try:
         data = request.get_json()
         youtube_url = data.get("youtubeUrl")
+
         if not youtube_url:
             return jsonify({"error": "youtubeUrl is required"}), 400
+        
+        if "v=" in youtube_url:
+            youtube_id = youtube_url.split("v=")[1].split("&")[0]
+        elif "youtu.be/" in youtube_url:
+            youtube_id = youtube_url.split("youtu.be/")[1].split("?")[0]
+        else:
+            return jsonify({"error": "Invalid YouTube URL"}), 400
 
-        with yt_dlp.YoutubeDL({}) as ydl:
+        ydl_opts = {}
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(youtube_url, download=False)
 
-        transcript = get_transcript(youtube_url, max_minutes=10)
-
+        transcript = get_transcript(youtube_id, 10)
+        
         info = {
             "title": info_dict.get("title", ""),
             "thumbnail": info_dict.get("thumbnail", ""),
             "channel": info_dict.get("channel", ""),
             "transcript": transcript
         }
+
         return jsonify(info), 200
 
     except Exception as e:
@@ -85,21 +105,15 @@ def get_info_youtubeUrl():
 
 @api_generate.route('/theory/quiz', methods=["POST"])
 def theory_quiz():
-    """
-    Placeholder endpoint for generating quiz theory from YouTube content.
-    Expect JSON: { "youtubeUrl": "https://..." }
-    """
     data = request.get_json() or {}
-    youtube_url = data.get("youtubeUrl", "").strip()
+    transcript = data.get("transcript", "").strip()
 
-    if not youtube_url:
-        return jsonify({"error": "youtubeUrl is required"}), 400
+    if not transcript:
+        return jsonify({"error": "transcript is required"}), 400
+    
+    theory = gen.generate_quiz_theory(transcript)
 
-    # TODO: Implement logic for theory quiz generation
-    # transcript = get_transcript(video_id, max_minutes=10)
-    # result = your_logic(transcript)
-
-    return jsonify({"message": "Theory quiz endpoint placeholder"}), 200
+    return jsonify({"theory": theory}), 200
 
 
 @api_generate.route('/theory/writing', methods=["POST"])
@@ -137,36 +151,26 @@ def theory_speaking():
 
 
 # method
-
-def get_transcript(youtube_url: str, max_minutes: int = 10) -> str:
+def get_transcript(video_id: str, max_minutes: int) -> str:
     """
-    Fetch transcript from YouTube video URL (not just video_id).
-    Automatically extracts video_id.
-    Returns transcript as a single string (up to max_minutes).
+    Fetch transcript from YouTube video and join into one text.
+    :param video_id: YouTube video ID (e.g. "dQw4w9WgXcQ")
+    :return: Full transcript as a single string
     """
-    # --- extract video_id ---
-    video_id = None
-    if "v=" in youtube_url:
-        video_id = youtube_url.split("v=")[1].split("&")[0]
-    elif "youtu.be/" in youtube_url:
-        video_id = youtube_url.split("youtu.be/")[1].split("?")[0]
-    if not video_id:
-        raise ValueError("Invalid YouTube URL")
-
-    # --- fetch transcript ---
     ytt_api = YouTubeTranscriptApi()
     data = ytt_api.fetch(video_id)
     transcript = data.to_raw_data()
-
+    
     max_seconds = max_minutes * 60
     limited_transcript = [
-        entry["text"]
-        for entry in transcript
-        if entry["start"] <= max_seconds and entry["text"].strip() != ""
+        entry['text'] 
+        for entry in transcript 
+        if entry['start'] <= max_seconds and entry['text'].strip() != ''
     ]
-
-    return " ".join(limited_transcript)
-
+    
+    full_text = " ".join(limited_transcript)
+    
+    return full_text
 
 
 app.register_blueprint(api_generate, url_prefix="/api/generate")

@@ -23,6 +23,7 @@ const { initSocket } = require("./socket/course.socket");
 // ⚡ Workers (Bull queue)
 require("./workers/course.worker");
 require("./workers/question.worker");
+require("./workers/lessonPart.worker");
 
 const app = express();
 

@@ -3,7 +3,7 @@ const Question = require("../models/question");
 const { fetchQuestionsFromAI } = require("../services/py.service");
 const { getIO } = require("../socket/course.socket");
 
-questionQueue.process("generateQuestions", async (job) => {
+questionQueue.process("generateQuestions", 1, async (job) => {
   const { lessonPartId, socketId, youtubeUrl } = job.data;
   const io = getIO();
 

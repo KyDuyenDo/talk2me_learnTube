@@ -3,15 +3,17 @@ const LessonPart = require("../models/lessonPart");
 const { fetchQuizTheoryFromAI } = require("../services/py.service");
 const { getIO } = require("../socket/course.socket");
 
-lessonQueue.process("createTheory", async (job) => {
+lessonQueue.process("createTheory", 1, async (job) => {
   const { lessonParts, transcript, socketId } = job.data;
   const io = getIO();
 
   try {
     const theory = await fetchQuizTheoryFromAI(transcript);
 
+    const ids = lessonParts.map(lp => lp._id);
+
     await LessonPart.updateMany(
-      { _id: { $in: lessonParts } },
+      { _id: { $in: ids } },
       { $set: { theory } }
     );
 
