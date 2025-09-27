@@ -22,6 +22,6 @@ routes.get("/refresh", refresh);
 routes.get('/getInfoUser',authMiddleware, getInfoUser)
 routes.put("/changePassWord", authMiddleware, changePassWord)
 routes.put("/changeInfo", authMiddleware, changeInfo)
-routes.delete("/deleteUser/:id", authMiddleware, deleteUser)
+routes.delete("/deleteUser", authMiddleware, deleteUser)
 
 module.exports = routes;

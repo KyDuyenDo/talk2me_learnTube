@@ -7,7 +7,8 @@ import google from "../../../assets/google.svg";
 import facebook from "../../../assets/facebook.svg";
 import SocialButton from "../components/SocialButton";
 import Input from "../components/Input";
-import { useRegister } from "../../../hooks/useAuth"; // giả sử hook gọi API
+import { useRegister } from "../../../hooks/useAuth"; 
+// giả sử hook gọi API
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -121,9 +122,10 @@ export default function Register() {
 
             <button
               type="submit"
+              disabled = {registerUser.isPending}
               className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
             >
-              Sign Up
+              {registerUser.isPending ? "Loading" : "Sign Up"}
             </button>
           </form>
         </div>

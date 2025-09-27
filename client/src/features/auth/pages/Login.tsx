@@ -104,9 +104,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled = {loginUser.isPending}
               className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
             >
-              Login
+              {loginUser.isPending ? "Loading.." : "Login"}
             </button>
           </form>
         </div>
