@@ -1,31 +1,29 @@
-import { data } from "react-router-dom"
-import { api, handleApiError } from "../../../api/utils"
-
+import { apiLogin, api, handleApiError } from "../../../api/utils"
 
 
 export async function loginUser(formData: FormData) {
   try {
-    const response = await api.post("api/user/signin", formData, {
+    const response = await apiLogin.post("api/user/signin", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    return { error: null, data: response.data }
-  } catch (error) {
-    console.log(error)
+    return response.data
+  } catch (err) {
+    return handleApiError(err)
   }
 }
 
 export async function registerUser(formData: FormData) {
   try {
-    const response = await api.post("/api/user/create", formData, {
+    const response = await apiLogin.post("/api/user/create", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    return { error: null, data: response.data }
-  } catch (error) {
-    console.log(error)
+    return response.data
+  } catch (err) {
+    return handleApiError(err)
   }
 }
 
@@ -79,7 +77,7 @@ export async function deleteUser() {
       error: null,
       data: response.data
     }
-  }catch(err){
+  } catch (err) {
     handleApiError(err)
   }
 }

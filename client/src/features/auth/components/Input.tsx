@@ -1,31 +1,23 @@
-import type React from "react"
-
-import { useEffect, useRef, useState, type FunctionComponent } from "react"
+import React, { useState, useEffect, useRef, forwardRef } from "react"
 import { EyeIcon, EyeOffIcon } from "../../../utils/constant/icon"
 
-interface InputProps {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isObscure?: boolean
-  validate?: () => boolean
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
-  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
-  value?: string
   error?: boolean
 }
 
-const Input: FunctionComponent<InputProps> = (props) => {
+const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const [obscure, setObscure] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const internalRef = useRef<HTMLInputElement>(null)
+  const inputRef = (ref as React.RefObject<HTMLInputElement>) || internalRef
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
 
   useEffect(() => {
     if (cursorPosition !== null && inputRef.current) {
       setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.setSelectionRange(cursorPosition, cursorPosition)
-          setCursorPosition(null)
-        }
+        inputRef.current?.setSelectionRange(cursorPosition, cursorPosition)
+        setCursorPosition(null)
       }, 0)
     }
   }, [obscure, cursorPosition])
@@ -49,35 +41,37 @@ const Input: FunctionComponent<InputProps> = (props) => {
 
   return (
     <div
-      className={`${props.error == true ? "border-[var(--border-width-normal)] border-[var(--color-error)]" : "border-[var(--border-width-thin)] border-[var(--color-border)]"} px-[var(--spacing-md)] rounded-[var(--border-radius-md)] hover:border-[var(--color-text-secondary)] focus-within:border-[var(--border-width-normal)] focus-within:!border-[var(--color-primary)] bg-[var(--color-background)]`}
+      className={`flex items-center px-[var(--spacing-md)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] border ${
+        props.error
+          ? "border-[var(--color-error)]"
+          : "border-[var(--color-border)] focus-within:border-[var(--color-primary)]"
+      }`}
     >
-      <div className="h-12 flex items-center">
-        <input
-          ref={inputRef}
-          type={props.isObscure && !obscure ? "password" : "text"}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          value={props.value}
-          className="w-full outline-0 py-[var(--spacing-xs)] [&::-ms-reveal]:hidden [&::-webkit-textfield-decoration-container]:hidden text-[var(--color-text-primary)] bg-transparent placeholder-[var(--color-text-muted)]"
-          onChange={props.onChange}
-        />
-        {props.isObscure && (
-          <button
-            type="button"
-            className="hover:cursor-pointer"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleToggleObscure}
-          >
-            {obscure === true ? (
-              <EyeIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
-            ) : (
-              <EyeOffIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
-            )}
-          </button>
-        )}
-      </div>
+      <input
+        ref={inputRef}
+        type={props.isObscure && !obscure ? "password" : "text"}
+        className="w-full outline-0 py-[var(--spacing-xs)] bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)]"
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        {...props} // bao gồm {...register("fieldName")} từ React Hook Form
+      />
+      {props.isObscure && (
+        <button
+          type="button"
+          className="hover:cursor-pointer"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={handleToggleObscure}
+        >
+          {obscure ? (
+            <EyeIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
+          ) : (
+            <EyeOffIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
+          )}
+        </button>
+      )}
     </div>
   )
-}
+})
 
+Input.displayName = "Input"
 export default Input

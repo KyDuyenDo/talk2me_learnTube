@@ -12,6 +12,10 @@ const api = axios.create({
   },
 });
 
+const apiLogin = axios.create({
+  baseURL,
+});
+
 // Request Interceptor -> luôn attach token vào header
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken;
@@ -21,7 +25,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor -> auto refresh nếu 401
+// Response Interceptor
+
+
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -41,26 +47,31 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const { setLogout } = useUserStore()
+    const { setLogout } = useUserStore.getState();
+
+    const errorMessage =
+      error?.response?.data?.message || error.message || "Có lỗi xảy ra";
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (originalRequest.url.includes("/api/user/refresh")) {
-        // nếu refresh cũng 401 => logout luôn
-        setLogout()
+        setLogout();
         window.location.href = "/login";
-        return Promise.reject(error);
+        return Promise.reject(new Error(errorMessage));
       }
 
       if (isRefreshing) {
-        // đợi refresh xong rồi retry lại request
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
             originalRequest.headers["Authorization"] = "Bearer " + token;
             return api(originalRequest);
           })
-          .catch((err) => Promise.reject(err));
+          .catch((err) => {
+            const msg =
+              err?.response?.data?.message || err.message || "Có lỗi xảy ra";
+            return Promise.reject(new Error(msg));
+          });
       }
 
       originalRequest._retry = true;
@@ -75,34 +86,37 @@ api.interceptors.response.use(
 
         processQueue(null, newToken);
 
+        originalRequest.headers["Authorization"] = "Bearer " + newToken;
         return api(originalRequest);
-      } catch (err) {
+      } catch (err: any) {
+        const msg =
+          err?.response?.data?.message || err.message || "Có lỗi xảy ra";
         processQueue(err, null);
-        setLogout()
+        setLogout();
         window.location.href = "/login";
-        return Promise.reject(err);
+        return Promise.reject(new Error(msg));
       } finally {
         isRefreshing = false;
       }
     }
 
     if (error.response?.status === 403) {
-      setLogout()
+      setLogout();
       window.location.href = "/login";
     }
 
-    return Promise.reject(error);
+    return Promise.reject(new Error(errorMessage));
   }
 );
 
+
 const handleApiError = async (error: any) => {
-    try {
-        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
-        const data = null;
-        return { error: errorMessage, data };
-    } catch (err) {
-        throw new Error("An unexpected error occurred.");
-    }
+  try {
+    const msg = error?.response?.data?.message || error.message || "Có lỗi xảy ra";
+    return Promise.reject(new Error(msg));
+  } catch (err) {
+    throw new Error("An unexpected error occurred.");
+  }
 };
 
-export { api, handleApiError };
+export { api, apiLogin, handleApiError };

@@ -16,7 +16,7 @@ type ProfileProps = {
 
 export default function UserProfile({ onOpen, onClose }: ProfileProps) {
     const { mutate: updateUser } = changeInfoUser()
-    const { user, setUser } = useUserStore()
+    const { user } = useUserStore()
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         name: user?.name,

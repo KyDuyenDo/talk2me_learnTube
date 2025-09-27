@@ -1,99 +1,46 @@
-import type React from "react"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import rocket from "../../../assets/rocket.png";
+import google from "../../../assets/google.svg";
+import facebook from "../../../assets/facebook.svg";
+import SocialButton from "../components/SocialButton";
+import Input from "../components/Input";
+import { useRegister } from "../../../hooks/useAuth"; // giả sử hook gọi API
 
-import { useState, type FunctionComponent } from "react"
-import rocket from "../../../assets/rocket.png"
-import google from "../../../assets/google.svg"
-import facebook from "../../../assets/facebook.svg"
-import SocialButton from "../components/SocialButton"
-import Input from "../components/Input"
-import ErrorAlert from "../components/ErrorAlert"
-import { useRegister } from "../../../hooks/useAuth"
+const registerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
+type RegisterFormData = z.infer<typeof registerSchema>;
 
-const RegisterPage: FunctionComponent = () => {
-  const registerMutation = useRegister()
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; general?: string }>({})
-  const [touched, setTouched] = useState<{ name: boolean; email: boolean; password: boolean }>({
-    name: false,
-    email: false,
-    password: false,
-  })
+export default function Register() {
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!email) return "Required field"
-    if (!emailRegex.test(email)) return "E-mail must be valid"
-    return null
-  }
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const validatePassword = (password: string) => {
-    if (!password) return "Required field"
-    return null
-  }
+  const registerUser = useRegister();
 
-  const handleEmailBlur = () => {
-    setTouched((prev) => ({ ...prev, email: true }))
-    const emailError = validateEmail(email)
-    setErrors((prev) => ({ ...prev, email: emailError || undefined }))
-  }
+  const onSubmit = async (data: RegisterFormData) => {
+    setServerError(null);
 
-  const handlePasswordBlur = () => {
-    setTouched((prev) => ({ ...prev, password: true }))
-    const passwordError = validatePassword(password)
-    setErrors((prev) => ({ ...prev, password: passwordError || undefined }))
-  }
+    // Nếu API yêu cầu FormData:
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value)
-    if (!name) {
-      const nameError = "Required name"
-      setErrors((prev) => ({ ...prev, name: nameError || undefined }))
-    }
-  }
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
-    if (touched.email) {
-      const emailError = validateEmail(e.target.value)
-      setErrors((prev) => ({ ...prev, email: emailError || undefined }))
-    }
-  }
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value)
-    if (touched.password) {
-      const passwordError = validatePassword(e.target.value)
-      setErrors((prev) => ({ ...prev, password: passwordError || undefined }))
-    }
-  }
-
-  const handleRegister = () => {
-    const emailError = validateEmail(email)
-    const passwordError = validatePassword(password)
-
-    const formData = new FormData()
-    formData.append("name", name)
-    formData.append("email", email)
-    formData.append("password", password)
-
-    setErrors({
-      email: emailError || undefined,
-      password: passwordError || undefined,
-      general: !emailError && !passwordError && !email ? "Couldn't find your account." : undefined,
-    })
-    if (!emailError && !passwordError && !email) return;
-    registerMutation.mutate(formData, {
-      onSuccess: (data) => {
-        if(data.error) setErrors({general: data.error});
+    registerUser.mutate(formData, {
+      onError: (err: any) => {
+        // Xử lý lỗi từ server
+        setServerError(err?.message || "Server error");
       },
-      onError: (error) => {
-        console.log(error)
-        return error.message;
-      }
-    })
+    });
   }
 
   return (
@@ -111,10 +58,12 @@ const RegisterPage: FunctionComponent = () => {
               alt="Rocket"
             />
           </div>
-          <div className="social flex justify-between items-start flex-wrap">
+
+          <div className="social flex justify-between items-start flex-wrap mb-3">
             <SocialButton icon={google} text="Google" />
             <SocialButton icon={facebook} text="Facebook" />
           </div>
+
           <div className="divider flex items-center my-3">
             <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
             <span className="px-[var(--spacing-lg)] text-[var(--font-size-lg)] font-semibold text-[var(--color-text-primary)]">
@@ -122,56 +71,63 @@ const RegisterPage: FunctionComponent = () => {
             </span>
             <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
           </div>
-          <div className="form text-left">
+
+          <form onSubmit={handleSubmit(onSubmit)} className="form text-left">
+            {/* Name */}
             <div className="mb-2.5">
               <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
                 Your Name
               </label>
             </div>
             <div className="mb-[10px]">
-              <Input error={!!errors.name} value={name} onChange={handleNameChange} />
-              <div className="h-[14px]"></div>
-              {errors.name && <ErrorAlert text={errors.name} />}
+              <Input {...register("name")} error={!!errors.name} />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              )}
             </div>
+
+            {/* Email */}
             <div className="mb-2.5">
-              <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">Email</label>
+              <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
+                Email
+              </label>
             </div>
             <div className="mb-[10px]">
-              <Input error={!!errors.email} value={email} onChange={handleEmailChange} onBlur={handleEmailBlur} />
-              <div className="h-[14px]"></div>
-              {errors.email && <ErrorAlert text={errors.email} />}
+              <Input {...register("email")} error={!!errors.email} />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
-            <div className="flex justify-between">
-              <label className="mb-2.5 text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
+
+            {/* Password */}
+            <div className="mb-2.5">
+              <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
                 Password
               </label>
             </div>
             <div className="mb-[10px]">
-              <Input
-                error={!!errors.password}
-                isObscure={true}
-                value={password}
-                onChange={handlePasswordChange}
-                onBlur={handlePasswordBlur}
-              />
-              <div className="h-[14px]"></div>
-              {errors.password && <ErrorAlert text={errors.password} />}
+              <Input {...register("password")} error={!!errors.password} isObscure />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
-            {errors.general && (
-              <div className="mb-[10px]">
-                <ErrorAlert text={errors.general} />
+
+            {/* Server error */}
+            {serverError && (
+              <div className="w-full flex justify-center my-2">
+                <p className="text-red-500 text-sm font-semibold">{serverError}</p>
               </div>
             )}
-            <div>
-              <button
-                onClick={handleRegister}
-                className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
+
+            <button
+              type="submit"
+              className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
+            >
+              Sign Up
+            </button>
+          </form>
         </div>
+
         <footer className="px-5 pb-10 pt-1.5 w-full text-[var(--color-text-secondary)]">
           Have an account?
           <a
@@ -183,7 +139,5 @@ const RegisterPage: FunctionComponent = () => {
         </footer>
       </div>
     </div>
-  )
+  );
 }
-
-export default RegisterPage
