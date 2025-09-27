@@ -4,13 +4,11 @@ import { useUserStore } from '../store/useUserStore'
 
 type LoginInput = FormData
 
-type LoginResponse = {
-    error: string | null;
-    data: {
-        accessToken: string | null
-    };
-} | undefined | null
-
+interface LoginResponse {
+    accessToken?: string;
+    message?: string;
+    error?: string;
+}
 
 
 export function useLogin() {
@@ -18,24 +16,18 @@ export function useLogin() {
     const queryClient = useQueryClient()
     return useMutation<LoginResponse, Error, LoginInput>({
         mutationFn: loginUser,
-        onSuccess: (data) => {
-            if (data?.error) {
-                return
-            } else if (data?.data) {
-                setAccessToken(data?.data.accessToken)
+        onSuccess: (data : any) => {
+            if (data) {
+                setAccessToken(data?.accessToken || "")
                 queryClient.invalidateQueries({ queryKey: ["user"] });
             }
-            // Điều hướng
+
             if (redirectPath) {
                 window.location.href = redirectPath; // về lại trang trước đó
                 setRedirectPath(null); // reset để lần sau ko bị dính
             } else {
                 window.location.href = "/"; // fallback mặc định
             }
-        },
-        onError: (error) => {
-            console.error(error);
-            return error.message;
         },
     });
 }
@@ -47,10 +39,7 @@ export function useRegister() {
             if (data?.error) return;
             window.location.href = "/login"
         },
-        onError: (error) => {
-            console.log(error)
-            return error.message;
-        }
+       
     })
 }
 

@@ -1,31 +1,29 @@
-import { data } from "react-router-dom"
-import { api, handleApiError } from "../../../api/utils"
-
+import { apiLogin, api, handleApiError } from "../../../api/utils"
 
 
 export async function loginUser(formData: FormData) {
   try {
-    const response = await api.post("api/user/signin", formData, {
+    const response = await apiLogin.post("api/user/signin", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    return { error: null, data: response.data }
-  } catch (error) {
-    console.log(error)
+    return response.data
+  } catch (err) {
+    return handleApiError(err)
   }
 }
 
 export async function registerUser(formData: FormData) {
   try {
-    const response = await api.post("/api/user/create", formData, {
+    const response = await apiLogin.post("/api/user/create", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    return { error: null, data: response.data }
-  } catch (error) {
-    console.log(error)
+    return response.data
+  } catch (err) {
+    return handleApiError(err)
   }
 }
 
@@ -42,20 +40,20 @@ export async function logout() {
   try {
     await api.get("/api/user/logout")
   } catch (error) {
-    console.log(error)
+    return handleApiError(error)
   }
 }
 
 export async function changePassWord(formData: FormData) {
   try {
-    const response = await api.post("/api/user/changePassword", formData, {
+    const response = await api.put("/api/user/changePassword", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    return { error: null, data: response.data }
+    return response.data
   } catch (error) {
-    console.log(error)
+    return handleApiError(error)
   }
 }
 
@@ -68,18 +66,14 @@ export async function changeInfo(formData: FormData) {
     })
     return { error: null, data: response.data.user }
   } catch (err) {
-    console.log(err)
+    handleApiError(err)
   }
 }
 
 export async function deleteUser() {
   try {
-    const response = await api.post(`api/user/deleteUser`)
-    return {
-      error: null,
-      data: response.data
-    }
-  }catch(err){
+    const response = await api.delete(`api/user/deleteUser`)
+  } catch (err) {
     handleApiError(err)
   }
 }
