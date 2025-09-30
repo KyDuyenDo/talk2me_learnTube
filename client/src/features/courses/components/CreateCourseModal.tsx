@@ -1,5 +1,4 @@
 import type { FunctionComponent } from "react"
-import type { Category } from "../../../store/courseStore"
 import { ModalHeader } from "./ModalHeader"
 import { YouTubeUrlInput } from "./YouTubeUrlInput"
 import { VideoPreview } from "./VideoPreview"
@@ -7,6 +6,7 @@ import { CategorySelector } from "./CategorySelector"
 import { ModalActions } from "./ModalActions"
 import { useYouTubeValidation } from "../hooks/useYouTubeValidation"
 import { useCourseForm } from "../hooks/useCourseForm"
+import type { Category } from "../types"
 
 interface CreateCourseModalProps {
   isOpen: boolean

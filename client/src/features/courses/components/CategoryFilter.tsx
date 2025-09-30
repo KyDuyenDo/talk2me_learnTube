@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FunctionComponent } from "react"
-import type { Category } from "../../../store/courseStore"
 import { CheckIcon, ChevronDown, PlusIcon } from "../../../utils/constant/icon"
+import type { Category } from "../types"
 
 interface CategoryFilterProps {
   categories: Category[]

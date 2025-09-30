@@ -1,7 +1,6 @@
 import { Controller } from "react-hook-form"
 import type { Control, FieldErrors, UseFormSetValue, UseFormClearErrors } from "react-hook-form"
-import type { Category } from "../../../store/courseStore"
-import type { FormData } from "../types"
+import type { Category, FormData } from "../types"
 import ErrorMessage from "../../../components/ErrorMessage"
 
 

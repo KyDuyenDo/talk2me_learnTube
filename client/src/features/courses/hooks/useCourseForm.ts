@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import type { FormData, VideoInfo } from "../types"
+import { useCreateCourse } from "./useCoursesApi"
 
 export const useCourseForm = (isOpen: boolean) => {
   const [showCreateCategory, setShowCreateCategory] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate, isPending, error, isSuccess } = useCreateCourse();
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -32,37 +33,38 @@ export const useCourseForm = (isOpen: boolean) => {
       return
     }
 
-    setIsSubmitting(true)
-
     try {
       let categoryId = data.categoryId
 
       if (showCreateCategory && data.newCategoryName.trim()) {
         console.log("Creating new category:", data.newCategoryName.trim())
-        categoryId = "new-category-id"
+        categoryId = "68cbc96a95ca2402a9e3d626"
       }
 
-      console.log("Creating course:", {
-        title: data.title.trim(),
-        description: data.description.trim(),
-        youtubeUrl: data.youtubeUrl.trim(),
-        categoryId,
-      })
-
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      onClose()
+      mutate(
+        { youtubeUrl: data.youtubeUrl.trim(), categoryId: "68cbc96a95ca2402a9e3d626" },
+        {
+          onSuccess: () => {
+            console.log("Course created successfully")
+            onClose()
+          },
+          onError: (err) => {
+            console.error("Failed to create course:", err)
+          },
+        }
+      )
     } catch (error) {
       console.error("Failed to create course:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+    } 
   }
 
   return {
     form,
     showCreateCategory,
     setShowCreateCategory,
-    isSubmitting,
+    isSubmitting: isPending,
+    error,
+    isSuccess,
     handleSubmit,
   }
 }

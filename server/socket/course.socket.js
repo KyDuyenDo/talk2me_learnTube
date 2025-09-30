@@ -2,14 +2,15 @@ const { Server } = require("socket.io");
 
 let io;
 
-function initSocket(server) {
+function initSocket(server, callback) {
     io = new Server(server, {
-        cors: { origin: "*" },
+        cors: {
+            origin: 'http://localhost:5173',
+            methods: ["GET", "POST"]
+        }
     });
-
-    io.on("connection", (socket) => {
-        console.log("⚡ Client connected:", socket.id);
-    });
+    
+    callback(io)
 }
 
 function getIO() {

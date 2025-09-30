@@ -62,7 +62,12 @@ app.use("/api/question", questionRouter);
 const server = http.createServer(app);
 
 // Initialize Socket.io
-initSocket(server);
+initSocket(server, (io) => {
+  io.on('connection', (socket) => {
+    console.log("user connected")
+    socket.on('disconnect', () => console.log('user disconnected'));
+  });
+})
 
 // Start server
 const PORT = process.env.PORT || 8000;

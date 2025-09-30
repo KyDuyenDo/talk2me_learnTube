@@ -18,7 +18,9 @@ questionQueue.process("generateQuestions", 1, async (job) => {
       }))
     );
 
-    io.to(socketId).emit("questionsGenerated", { lessonPartId, questions: saved });
+    io.to(socketId).emit("questionsGenerated", { lessonPartId, questions: saved }, () => {
+      console.log("questionsGenerated")
+    });
     return { saved };
   } catch (error) {
     console.error('Failed to generate questions for lessonPartId:', lessonPartId, error);

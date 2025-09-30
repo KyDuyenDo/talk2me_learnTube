@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCourses } from "../hooks/useCoursesApi"
 
@@ -9,6 +9,7 @@ import { CreateCourseModal } from "../components/CreateCourseModal"
 import { CreateCourseButton } from "../components/CreateCourseButton"
 import CourseGrid from "../components/CourseGrid"
 import type { Category, Course } from "../types"
+import { socket } from "../../../utils/socket"
 
 export function Courses() {
   const navigate = useNavigate()
@@ -32,6 +33,19 @@ export function Courses() {
   const courses = coursesResponse?.data ?? []
   const categories: Category[] = []
   const categoriesLoading = false
+
+  useEffect(() => {
+
+    socket.on('connect', () => console.log("✅ Connected with id:", socket.id));
+    socket.on("courseCreated", (data) => {
+      console.log("📌 Course created:", data.course);
+    });
+
+    return () => {
+      socket.off("courseCreated");
+    };
+  }, []);
+
 
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses as Course[]
