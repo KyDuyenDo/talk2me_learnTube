@@ -72,7 +72,6 @@ export default function Register() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="form text-left">
-            {/* Name */}
             <div className="mb-2.5">
               <label className="text-[#1b1f2e] text-[16px] font-[700]">Your Name</label>
             </div>
@@ -82,7 +81,6 @@ export default function Register() {
               {errors.name && <ErrorAlert text={errors.name.message || "Required field"} />}
             </div>
 
-            {/* Email */}
             <div className="mb-2.5">
               <label className="text-[#1b1f2e] text-[16px] font-[700]">Email</label>
             </div>
@@ -92,7 +90,6 @@ export default function Register() {
               {errors.email && <ErrorAlert text={errors.email.message || "Invalid email"} />}
             </div>
 
-            {/* Password */}
             <div className="mb-2.5">
               <label className="text-[#1b1f2e] text-[16px] font-[700]">Password</label>
             </div>
@@ -104,7 +101,6 @@ export default function Register() {
               )}
             </div>
 
-            {/* Server error */}
             {serverError && (
               <div className="mb-[10px]">
                 <ErrorAlert text={serverError} />

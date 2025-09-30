@@ -67,7 +67,6 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="form text-left">
-            {/* Email */}
             <div className="mb-2.5">
               <label className="text-[#1b1f2e] text-[16px] font-[700]">Email</label>
             </div>
@@ -77,7 +76,6 @@ export default function LoginPage() {
               {errors.email && <ErrorAlert text={errors.email.message || "Invalid email"} />}
             </div>
 
-            {/* Password */}
             <div className="flex justify-between">
               <label className="mb-2.5 text-[#1b1f2e] text-[16px] font-[700]">Password</label>
               <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]">Forgot password?</a>
@@ -88,7 +86,6 @@ export default function LoginPage() {
               {errors.password && <ErrorAlert text={errors.password.message || "Required field"} />}
             </div>
 
-            {/* Server error */}
             {serverError && (
               <div className="mb-[10px]">
                 <ErrorAlert text={serverError} />
