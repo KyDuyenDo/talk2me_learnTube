@@ -7,11 +7,12 @@ import google from "../../../assets/google.svg"
 import facebook from "../../../assets/facebook.svg"
 import SocialButton from "../components/SocialButton"
 import Input from "../components/Input"
+import ErrorAlert from "../components/ErrorAlert"
 import { useLogin } from "../../../hooks/useAuth"
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("E-mail must be valid"),
+  password: z.string().min(1, "Required field"),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
@@ -20,31 +21,33 @@ export default function LoginPage() {
   const loginUser = useLogin()
   const [serverError, setServerError] = useState<string | null>(null)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
   const onSubmit = (data: LoginFormData) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
+    const formData = new FormData()
+    formData.append("email", data.email)
+    formData.append("password", data.password)
     setServerError(null)
     loginUser.mutate(formData, {
       onError: (err: any) => {
-        setServerError(err?.message || "Server error")
-      }
+        setServerError(err?.message || "Couldn't find your account.")
+      },
     })
   }
 
   return (
-    <div className="h-[100vh] w-[100vw] bg-[var(--color-background)]">
+    <div className="h-[100vh] w-[100vw]">
       <div className="h-[64px]"></div>
       <div className="m-auto max-w-[520px] pt-[10px] items-center text-center">
-        <div className="relative py-[var(--spacing-2xl)] px-[var(--spacing-2xl)] border-[var(--border-width-normal)] border-[var(--color-border)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-background)]">
+        <div className="relative py-[32px] px-[40px] border-2 border-[#e6e6eb] w-full rounded-sm">
           <div className="flex header text-left mb-4">
-            <h1 className="leading-[46px] text-[var(--font-size-4xl)] font-bold max-w-[278px] mb-4 text-[var(--color-text-primary)]">
-              Login
-            </h1>
+            <h1 className="leading-[46px] text-[40px] font-[900] max-w-[278px] mb-4">Login</h1>
             <img
               className="absolute top-[22px] right-[20px] w-[176px] -translate-y-[50%]"
               src={rocket || "/placeholder.svg"}
@@ -58,66 +61,54 @@ export default function LoginPage() {
           </div>
 
           <div className="divider flex items-center my-3">
-            <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
-            <span className="px-[var(--spacing-lg)] text-[var(--font-size-lg)] font-semibold text-[var(--color-text-primary)]">
-              or
-            </span>
-            <hr className="w-[100%] h-[1px] border-[var(--color-border)]" />
+            <hr className="w-[100%] h-[1px] text-gray-300" />
+            <span className="px-[20px] text-[20px] font-[600]">or</span>
+            <hr className="w-[100%] h-[1px] text-gray-300" />
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="form text-left">
             {/* Email */}
             <div className="mb-2.5">
-              <label className="text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
-                Email
-              </label>
+              <label className="text-[#1b1f2e] text-[16px] font-[700]">Email</label>
             </div>
             <div className="mb-[10px]">
               <Input {...register("email")} error={!!errors.email} />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-              )}
+              <div className="h-[14px]"></div>
+              {errors.email && <ErrorAlert text={errors.email.message || "Invalid email"} />}
             </div>
 
             {/* Password */}
             <div className="flex justify-between">
-              <label className="mb-2.5 text-[var(--color-text-primary)] text-[var(--font-size-base)] font-bold">
-                Password
-              </label>
-              <a className="hover:cursor-pointer mb-2.5 text-[var(--color-primary)] text-[var(--font-size-base)] font-bold">
-                Forgot password?
-              </a>
+              <label className="mb-2.5 text-[#1b1f2e] text-[16px] font-[700]">Password</label>
+              <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]">Forgot password?</a>
             </div>
             <div className="mb-[10px]">
               <Input {...register("password")} error={!!errors.password} isObscure />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-              )}
+              <div className="h-[14px]"></div>
+              {errors.password && <ErrorAlert text={errors.password.message || "Required field"} />}
             </div>
 
             {/* Server error */}
             {serverError && (
-              <div className="w-full flex justify-center my-2">
-                <p className="text-red-500 text-sm font-semibold">{serverError}</p>
+              <div className="mb-[10px]">
+                <ErrorAlert text={serverError} />
               </div>
             )}
 
             <button
               type="submit"
-              disabled = {loginUser.isPending}
-              className="hover:cursor-pointer p-[var(--spacing-md)] w-full rounded-[var(--border-radius-md)] bg-[var(--color-text-primary)] text-white text-[var(--font-size-base)] font-bold hover:bg-[var(--color-primary)] transition-colors"
+              disabled={loginUser.isPending}
+              className="hover:cursor-pointer p-[16px] w-full rounded-md bg-[#1b1f2e] text-amber-50 text-[16px] font-[700] hover:bg-[#536dfe]"
             >
               {loginUser.isPending ? "Loading.." : "Login"}
             </button>
           </form>
         </div>
 
-        <footer className="px-5 pb-10 pt-1.5 w-full text-[var(--color-text-secondary)]">
+        <footer className="px-5 pb-10 pt-1.5 w-full">
           Don't have an account?
-          <a
-            className="hover:cursor-pointer mb-2.5 text-[var(--color-primary)] text-[var(--font-size-base)] font-bold ml-1"
-            href="/register"
-          >
+          <a className="hover:cursor-pointer mb-2.5 text-[#536dfe] text-[16px] font-[700]" href="/register">
+            {" "}
             Sign Up
           </a>
         </footer>

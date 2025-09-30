@@ -55,4 +55,5 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
-*.env
+.env
+.env.local

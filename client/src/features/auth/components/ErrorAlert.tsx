@@ -6,7 +6,7 @@ interface ErrorAlertProps {
 
 const ErrorAlert: FunctionComponent<ErrorAlertProps> = (props) => {
   return (
-    <div className="border-[var(--border-width-normal)] border-[var(--color-error)] py-2 px-9 text-[var(--font-size-base)] my-[10px] leading-6 rounded-[var(--border-radius-md)] text-center bg-red-50 text-[var(--color-error)]">
+    <div className="[border-width:var(--border-width-normal)] [border-color:var(--color-error)] py-2 px-9 [font-size:var(--font-size-base)] my-[10px] leading-6 rounded-[var(--border-radius-md)] text-center bg-red-50 text-[var(--color-error)]">
       {props.text}
     </div>
   )

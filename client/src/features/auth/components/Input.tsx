@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react"
+import type React from "react"
+import { useState, useEffect, useRef, forwardRef } from "react"
 import { EyeIcon, EyeOffIcon } from "../../../utils/constant/icon"
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -41,34 +42,33 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
   return (
     <div
-      className={`flex items-center px-[var(--spacing-md)] rounded-[var(--border-radius-md)] bg-[var(--color-background)] border ${
-        props.error
-          ? "border-[var(--color-error)]"
-          : "border-[var(--color-border)] focus-within:border-[var(--color-primary)]"
-      }`}
+      className={`${props.error == true ? "border-2 border-red-600" : "border border-gray-400"} px-[12px] rounded-md hover:border-gray-700 focus-within:border-2 focus-within:!border-[#536dfe]`}
     >
-      <input
-        ref={inputRef}
-        type={props.isObscure && !obscure ? "password" : "text"}
-        className="w-full outline-0 py-[var(--spacing-xs)] bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)]"
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        {...props} // bao gồm {...register("fieldName")} từ React Hook Form
-      />
-      {props.isObscure && (
-        <button
-          type="button"
-          className="hover:cursor-pointer"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={handleToggleObscure}
-        >
-          {obscure ? (
-            <EyeIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
-          ) : (
-            <EyeOffIcon className={isFocused ? "!text-[var(--color-primary)]" : "text-[var(--color-text-muted)]"} />
-          )}
-        </button>
-      )}
+      <div className="h-12 flex items-center">
+        <input
+          ref={inputRef}
+          type={props.isObscure && !obscure ? "password" : "text"}
+          className="w-full outline-0 py-[8px] [&::-ms-reveal]:hidden [&::-webkit-textfield-decoration-container]:hidden"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...props}
+        />
+        {props.isObscure && (
+          <button
+            type="button"
+            className="hover:cursor-pointer"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handleToggleObscure}
+          >
+            {obscure ? (
+              
+              <EyeIcon className={isFocused ? "!text-[#536dfe]" : ""} />
+            ) : (
+              <EyeOffIcon className={isFocused ? "!text-[#536dfe]" : ""} />
+            )}
+          </button>
+        )}
+      </div>
     </div>
   )
 })
