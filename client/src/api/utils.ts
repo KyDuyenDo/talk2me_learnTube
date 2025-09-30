@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useUserStore } from "../store/useUserStore";
 
-const baseURL = "http://localhost:8000";
+const baseURL = "/api";
 
 const api = axios.create({
   baseURL,
@@ -53,7 +53,7 @@ api.interceptors.response.use(
       error?.response?.data?.message || error.message || "Có lỗi xảy ra";
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (originalRequest.url.includes("/api/user/refresh")) {
+      if (originalRequest.url.includes("/user/refresh")) {
         setLogout();
         window.location.href = "/login";
         return Promise.reject(new Error(errorMessage));
@@ -78,7 +78,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.get("/api/user/refresh");
+        const res = await api.get("/user/refresh");
         const newToken = res.data.accessToken;
 
         useUserStore.setState({ accessToken: newToken });
