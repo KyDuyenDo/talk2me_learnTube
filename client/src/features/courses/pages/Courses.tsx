@@ -33,18 +33,12 @@ export function Courses() {
   const courses = coursesResponse?.data ?? []
   const categories: Category[] = []
   const categoriesLoading = false
-
+  
   useEffect(() => {
-
-    socket.on('connect', () => console.log("✅ Connected with id:", socket.id));
     socket.on("courseCreated", (data) => {
       console.log("📌 Course created:", data.course);
     });
-
-    return () => {
-      socket.off("courseCreated");
-    };
-  }, []);
+  }, [socket])
 
 
   const filteredAndSortedCourses = useMemo(() => {

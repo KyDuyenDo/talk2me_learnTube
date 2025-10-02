@@ -46,7 +46,7 @@ export const courseApi = {
       if (params?.sortBy) searchParams.append("sortBy", params.sortBy)
       if (params?.sortOrder) searchParams.append("sortOrder", params.sortOrder)
 
-      const response = await api.get(`/api/course` /* + '?' + searchParams.toString() */);
+      const response = await api.get(`/course` /* + '?' + searchParams.toString() */);
 
       if (!response || !response.data) {
         throw new Error("Empty response from server");
@@ -59,7 +59,7 @@ export const courseApi = {
   },
 
   getCourse: async (courseId: string): Promise<Course> => {
-    const response = await api.get<ApiResponse<Course>>(`/api/courses/${courseId}`);
+    const response = await api.get<ApiResponse<Course>>(`/courses/${courseId}`);
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || "Failed to fetch course");
     }
@@ -75,7 +75,7 @@ export const courseApi = {
       formData.append(key, (courseData as any)[key]);
     }
 
-    const response = await api.post<ApiResponse<Course>>("/api/course", formData, {
+    const response = await api.post<ApiResponse<Course>>("/course", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -86,14 +86,14 @@ export const courseApi = {
   },
 
   deleteCourse: async (courseId: string): Promise<void> => {
-    const response = await api.delete<ApiResponse<null>>(`/api/courses/${courseId}`);
+    const response = await api.delete<ApiResponse<null>>(`/courses/${courseId}`);
     if (!response.data.success) {
       throw new Error(response.data.error || "Failed to delete course");
     }
   },
 
   updateProgress: async (courseId: string, progress: number): Promise<Course> => {
-    const response = await api.patch<ApiResponse<Course>>(`/api/courses/${courseId}`, { progress });
+    const response = await api.patch<ApiResponse<Course>>(`/courses/${courseId}`, { progress });
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || "Failed to update progress");
     }
@@ -104,7 +104,7 @@ export const courseApi = {
 
 export const categoryApi = {
   getCategories: async (): Promise<Category[]> => {
-    const response = await api.get<ApiResponse<Category[]>>(`/api/categories`);
+    const response = await api.get<ApiResponse<Category[]>>(`/categories`);
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.error || "Failed to fetch categories");
     }
@@ -112,7 +112,7 @@ export const categoryApi = {
   },
 
   createCategory: async (categoryData: { name: string; }): Promise<Category> => {
-    const response = await api.post<ApiResponse<Category>>("/api/categories", categoryData, {
+    const response = await api.post<ApiResponse<Category>>("/categories", categoryData, {
       headers: { "Content-Type": "application/json" },
     });
     if (!response.data.success || !response.data.data) {
@@ -122,7 +122,7 @@ export const categoryApi = {
   },
 
   deleteCategory: async (categoryId: string): Promise<void> => {
-    const response = await api.delete<ApiResponse<null>>(`/api/categories/${categoryId}`);
+    const response = await api.delete<ApiResponse<null>>(`/categories/${categoryId}`);
     if (!response.data.success) {
       throw new Error(response.data.error || "Failed to delete category");
     }

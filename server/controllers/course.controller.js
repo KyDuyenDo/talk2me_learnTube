@@ -4,11 +4,11 @@ const Course = require("../models/course");
 const createCourse = async (req, res, next) => {
   try {
     const courseData = req.body;
-    const { socketId } = req.query;
+    const { userId } = req.query;
 
     const job = await courseQueue.add("createCourse", {
       courseData,
-      socketId,
+      userId,
     },);
 
     res.status(202).json({

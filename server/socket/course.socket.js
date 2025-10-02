@@ -1,21 +1,29 @@
-const { Server } = require("socket.io");
-
-let io;
-
-function initSocket(server, callback) {
-    io = new Server(server, {
-        cors: {
-            origin: 'http://localhost:5173',
-            methods: ["GET", "POST"]
-        }
+const userSockets = new Map();
+function initSocket(io) {
+    io.on("connection", (socket) => {
+    console.log("⚡ New socket:", socket.id);
+    socket.on("register", (userId) => {
+        userSockets.set(userId, socket);
+        console.log(`✅ User ${userId} registered with socket ${socket.id}`);
     });
-    
-    callback(io)
+
+    socket.on("disconnect", () => {
+        [...userSockets.entries()].forEach(([userId, s]) => {
+            if (s.id === socket.id) {
+            userSockets.delete(userId);
+            console.log(`❌ User ${userId} disconnected`);
+            }
+        });
+    });
+  });
 }
 
-function getIO() {
-    if (!io) throw new Error("Socket.io not initialized");
-    return io;
+function getUserSocket(userId) {
+  return userSockets.get(userId);
 }
 
-module.exports = { initSocket, getIO };
+function getSocketAll() {
+  return userSockets;
+}
+
+module.exports = { initSocket, getUserSocket, getSocketAll };
