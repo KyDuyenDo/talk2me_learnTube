@@ -24,12 +24,22 @@ export default function Account() {
         logoutMutation.mutate()
     };
 
+    const handleOpenProfile=()=>{
+        setOpen((prev) => !prev)
+        setOpenChange(false)
+    }
+
+    const handleOpenPassWord=()=>{
+        setOpenChange((prev) => !prev)
+        setOpen(false)
+    }
+
     const items = [
         {
             icon: <ProfileIcon />,
             title: "Profile",
             description: "Manage your profile details.",
-            onClick: () => setOpen((prev) => !prev),
+            onClick: handleOpenProfile,
         },
         {
             icon: <LanguageIcon />,
@@ -40,7 +50,7 @@ export default function Account() {
             icon: <LockIcon />,
             title: "Change password",
             description: "Manage your subscriptions.",
-            onClick: () => setOpenChange((prev) => !prev),
+            onClick: handleOpenPassWord,
         },
         {
             icon: <LogoutIcon />,

@@ -6,7 +6,6 @@ const http = require("http");
 const fileUpload = require("express-fileupload");
 const helmet = require("helmet");
 
-
 // MongoDB
 const MongoDB = require("./utils/mongodb.util");
 MongoDB.connect(process.env.MONGODB_URI);
@@ -15,11 +14,13 @@ MongoDB.connect(process.env.MONGODB_URI);
 const courseRouter = require("./routes/course.route");
 const authRouter = require("./routes/user.route");
 const categoryRouter = require("./routes/category.route");
-const lessonPartRouter = require("./routes/lessonPart.route")
-const questionRouter = require("./routes/questions.route")
+const lessonPartRouter = require("./routes/lessonPart.route");
+const questionRouter = require("./routes/questions.route");
 
 // Socket
-const { initSocket } = require("./socket/course.socket");
+const { Server } = require("socket.io");
+const { initSocket }  = require("./socket/course.socket");
+
 
 // ⚡ Workers (Bull queue)
 require("./workers/course.worker");
@@ -37,17 +38,19 @@ app.use(express.static("client"));
 
 const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(helmet());
 // Routes
@@ -57,17 +60,17 @@ app.use("/api/category", categoryRouter);
 app.use("/api/lesson-part", lessonPartRouter);
 app.use("/api/question", questionRouter);
 
-
 // Create HTTP server for socket.io
 const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
 // Initialize Socket.io
-initSocket(server, (io) => {
-  io.on('connection', (socket) => {
-    console.log("user connected")
-    socket.on('disconnect', () => console.log('user disconnected'));
-  });
-})
+initSocket(io);
 
 // Start server
 const PORT = process.env.PORT || 8000;

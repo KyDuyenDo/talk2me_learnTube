@@ -11,8 +11,21 @@ import LoginPage from "./features/auth/pages/Login"
 import AccountPage from "./features/account/page/Account"
 import { Courses } from "./features/courses/pages/Courses"
 import QuizPage from "./features/question/pages/Quiz"
+import { useEffect } from "react"
+import { socket } from "../src/utils/socket"
+import { useUserStore } from "./store/useUserStore"
+
 
 function App() {
+    const { user } = useUserStore()
+    useEffect(() => {
+
+    socket.on('connect', () => console.log("✅ Connected with id:", socket.id));
+
+    if (user?.id) {
+      socket.emit("register", user.id);
+    }
+  }, []);
   return (
     <ThemeProvider>
       <BrowserRouter>

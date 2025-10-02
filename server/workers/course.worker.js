@@ -2,11 +2,11 @@ const { courseQueue, questionQueue, lessonQueue } = require("../queue/courseQueu
 const Course = require("../models/course");
 const { createLessonParts } = require("../services/lessonPartService");
 const { fetchExternalCourseInfo } = require("../services/py.service");
-const { getIO } = require("../socket/course.socket");
+const { getUserSocket } = require("../socket/course.socket");
 
 courseQueue.process("createCourse", async (job) => {
-  const { courseData, socketId } = job.data;
-  const io = getIO();
+  const { courseData, userId } = job.data;
+  const socket = getUserSocket(userId);
 
 
   const session = await Course.startSession();
@@ -22,7 +22,8 @@ courseQueue.process("createCourse", async (job) => {
     );
     console.log(newCourse)
 
-    io.to(socketId).emit("courseCreated", { course: newCourse }, () => {
+
+    socket.emit("courseCreated", { course: newCourse }, () => {
       console.log('courseCreated')
     });
 
