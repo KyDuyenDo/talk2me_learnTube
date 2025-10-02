@@ -61,15 +61,17 @@ export const useCategories = () => {
 
 // Mutation hooks POST
 export const useCreateCourse = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: courseApi.createCourse,
+    mutationFn: (data: { youtubeUrl: string; categoryId: string }) =>
+      courseApi.createCourse(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.all })
+      queryClient.invalidateQueries({ queryKey: courseKeys.all });
     },
-  })
-}
+  });
+};
+
 
 
 export const useDeleteCourse = () => {

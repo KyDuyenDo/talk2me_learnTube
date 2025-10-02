@@ -17,7 +17,9 @@ lessonQueue.process("createTheory", 1, async (job) => {
       { $set: { theory } }
     );
 
-    io.to(socketId).emit("theoryGenerated", { lessonParts, theory });
+    io.to(socketId).emit("theoryGenerated", { lessonParts, theory }, () => {
+      console.log('theoryGenerated')
+    });
 
     return { updated: lessonParts.length };
   } catch (error) {

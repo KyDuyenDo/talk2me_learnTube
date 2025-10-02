@@ -8,24 +8,25 @@ courseQueue.process("createCourse", async (job) => {
   const { courseData, socketId } = job.data;
   const io = getIO();
 
+
   const session = await Course.startSession();
   session.startTransaction();
 
   try {
-  
-    const externalCourseInfo = await fetchExternalCourseInfo(courseData.youtubeUrl);
-    console.log(externalCourseInfo)
 
+    const externalCourseInfo = await fetchExternalCourseInfo(courseData.youtubeUrl);
+    console.log("start 3")
     const [newCourse] = await Course.create(
       [{ ...courseData, ...externalCourseInfo }],
       { session }
     );
+    console.log(newCourse)
 
-    io.to(socketId).emit("courseCreated", { course: newCourse });
+    io.to(socketId).emit("courseCreated", { course: newCourse }, () => {
+      console.log('courseCreated')
+    });
 
     const lessonParts = await createLessonParts(newCourse._id, session);
-
-    io.to(socketId).emit("createTheory", { lessonParts });
 
     await session.commitTransaction();
     session.endSession();
@@ -52,7 +53,7 @@ courseQueue.process("createCourse", async (job) => {
 
     return { courseId: newCourse._id };
   } catch (error) {
-   
+
     await session.abortTransaction();
     session.endSession();
 

@@ -1,5 +1,6 @@
 import type { FunctionComponent } from "react"
-import type { Course } from "../../../store/courseStore"
+import type { Course } from "../types"
+
 
 interface CourseCardProps {
   course: Course

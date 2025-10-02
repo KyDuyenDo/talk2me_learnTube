@@ -67,24 +67,22 @@ export const courseApi = {
   },
 
   createCourse: async (courseData: {
-    title: string;
-    description?: string;
     youtubeUrl: string;
     categoryId: string;
-  }): Promise<Course> => {
+  }) => {
     const formData = new FormData();
     for (const key in courseData) {
       formData.append(key, (courseData as any)[key]);
     }
 
-    const response = await api.post<ApiResponse<Course>>("/api/courses", formData, {
+    const response = await api.post<ApiResponse<Course>>("/api/course", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || "Failed to create course");
+    if (!response.data) {
+      throw new Error("Failed to create course");
     }
-    return response.data.data;
+    return response.data;
   },
 
   deleteCourse: async (courseId: string): Promise<void> => {
