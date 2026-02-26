@@ -141,6 +141,12 @@ class QuestionGenerator:
         content = response["message"]["content"]
 
         try:
+            # Handle possible markdown wrap in LLM response
+            if content.startswith("```json"):
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif content.startswith("```"):
+                content = content.split("```")[1].split("```")[0].strip()
+                
             data = json.loads(content)
             quiz = QuizSet(questions=data)
             return quiz

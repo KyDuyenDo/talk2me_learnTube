@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCourses } from "../hooks/useCoursesApi"
 
@@ -8,6 +8,7 @@ import { CourseSortDropdown, type SortOption } from "../components/CourseSortDro
 import { CreateCourseModal } from "../components/CreateCourseModal"
 import { CreateCourseButton } from "../components/CreateCourseButton"
 import CourseGrid from "../components/CourseGrid"
+import { PendingCourseCard } from "../components/PendingCourseCard"
 import type { Category, Course } from "../types"
 import { socket } from "../../../utils/socket"
 
@@ -33,19 +34,47 @@ export function Courses() {
   const courses = coursesResponse?.data ?? []
   const categories: Category[] = []
   const categoriesLoading = false
+  const socketIdRef = useRef<string>("")
+
+  // Map of youtubeUrl → thumbnail (captured from videoInfo at submit time)
+  const [pendingCourses, setPendingCourses] = useState<
+    Map<string, { thumbnail: string; title: string }>
+  >(new Map())
+
+  const handleCoursePending = useCallback(
+    (youtubeUrl: string, info: { thumbnail: string; title: string }) => {
+      setPendingCourses((prev) => {
+        const next = new Map(prev)
+        next.set(youtubeUrl, info)
+        return next
+      })
+    },
+    []
+  )
 
   useEffect(() => {
-
-    socket.on('connect', () => console.log("✅ Connected with id:", socket.id));
+    socket.on("connect", () => {
+      socketIdRef.current = socket.id as string
+      console.log("✅ Connected with id:", socket.id)
+    })
     socket.on("courseCreated", (data) => {
-      console.log("📌 Course created:", data.course);
-    });
+      console.log("📌 Course created:", data.course)
+      // Remove ghost card now that the real card will appear after refetch
+      if (data.course?.youtubeUrl) {
+        setPendingCourses((prev) => {
+          const next = new Map(prev)
+          next.delete(data.course.youtubeUrl)
+          return next
+        })
+      }
+      refetchCourses()
+    })
 
     return () => {
-      socket.off("courseCreated");
-    };
-  }, []);
-
+      socket.off("connect")
+      socket.off("courseCreated")
+    }
+  }, [])
 
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses as Course[]
@@ -95,7 +124,6 @@ export function Courses() {
     navigate(`/courses/${course._id}`)
   }
 
-
   const handleCreateCategory = () => {
     setShowCreateModal(true)
   }
@@ -112,12 +140,6 @@ export function Courses() {
 
         <CreateCourseButton onClick={() => setShowCreateModal(true)} disabled={isLoading} />
       </div>
-
-      {/* {!isLoading && courses.length > 0 && (
-        <div className="mb-8">
-          <CourseStats courses={courses as Course[]} categories={categories as Category[]} />
-        </div>
-      )} */}
 
       <div className="mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
@@ -137,6 +159,15 @@ export function Courses() {
         <CourseSortDropdown selectedSort={sortOption} onSortChange={setSortOption} />
       </div>
 
+      {/* Ghost pending cards appear at the top of the grid, before real courses */}
+      {pendingCourses.size > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+          {Array.from(pendingCourses.entries()).map(([url, info]) => (
+            <PendingCourseCard key={url} thumbnail={info.thumbnail} title={info.title} />
+          ))}
+        </div>
+      )}
+
       <CourseGrid
         courses={filteredAndSortedCourses}
         isLoading={isLoading}
@@ -145,7 +176,9 @@ export function Courses() {
         emptyMessage={
           searchQuery || selectedCategories.length > 0
             ? "No courses match your filters"
-            : "No courses found. Create your first course to get started!"
+            : pendingCourses.size > 0
+              ? "Your first course is being created above…"
+              : "No courses found. Create your first course to get started!"
         }
         onRetry={refetchCourses}
       />
@@ -154,6 +187,8 @@ export function Courses() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         categories={categories}
+        socketIdRef={socketIdRef}
+        onPending={handleCoursePending}
       />
     </div>
   )

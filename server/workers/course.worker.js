@@ -8,55 +8,52 @@ courseQueue.process("createCourse", async (job) => {
   const { courseData, socketId } = job.data;
   const io = getIO();
 
-
   const session = await Course.startSession();
   session.startTransaction();
 
   try {
-
     const externalCourseInfo = await fetchExternalCourseInfo(courseData.youtubeUrl);
-    console.log("start 3")
     const [newCourse] = await Course.create(
       [{ ...courseData, ...externalCourseInfo }],
       { session }
     );
-    console.log(newCourse)
 
-    io.to(socketId).emit("courseCreated", { course: newCourse }, () => {
-      console.log('courseCreated')
-    });
+    // ① Notify client the course document is ready
+    io.to(socketId).emit("courseCreated", { course: newCourse });
 
     const lessonParts = await createLessonParts(newCourse._id, session);
 
     await session.commitTransaction();
     session.endSession();
 
-    await lessonQueue.add(
-      "createTheory",
-      { lessonParts, transcript: externalCourseInfo.transcript },
-      // { attempts: 3, backoff: { type: "fixed", delay: 5000 } }
-    );
+    // ② Notify client which lesson-part IDs exist (all pending theory/questions)
+    io.to(socketId).emit("lessonPartsCreated", {
+      courseId: newCourse._id,
+      lessonParts: lessonParts.map((lp) => ({ _id: lp._id, type: lp.type })),
+    });
 
+    // ③ Queue theory generation (pass socketId so the worker can emit back)
+    await lessonQueue.add("createTheory", {
+      lessonParts,
+      transcript: externalCourseInfo.transcript,
+      socketId,
+    });
+
+    // ④ Queue question generation for quiz parts
     for (const part of lessonParts) {
       if (part.type === "quiz") {
-        await questionQueue.add(
-          "generateQuestions",
-          {
-            lessonPartId: part._id,
-            youtubeUrl: courseData.youtubeUrl,
-            socketId,
-          },
-          // { attempts: 3, backoff: { type: "exponential", delay: 3000 } }
-        );
+        await questionQueue.add("generateQuestions", {
+          lessonPartId: part._id,
+          youtubeUrl: courseData.youtubeUrl,
+          socketId,
+        });
       }
     }
 
     return { courseId: newCourse._id };
   } catch (error) {
-
     await session.abortTransaction();
     session.endSession();
-
     console.error("Failed to create course:", error);
     throw error;
   }

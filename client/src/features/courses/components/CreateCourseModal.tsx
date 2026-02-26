@@ -1,4 +1,4 @@
-import type { FunctionComponent } from "react"
+import type { FunctionComponent, RefObject } from "react"
 import { ModalHeader } from "./ModalHeader"
 import { YouTubeUrlInput } from "./YouTubeUrlInput"
 import { VideoPreview } from "./VideoPreview"
@@ -12,10 +12,19 @@ interface CreateCourseModalProps {
   isOpen: boolean
   onClose: () => void
   categories: Category[]
+  socketIdRef: RefObject<string>
+  onPending: (youtubeUrl: string, info: { thumbnail: string; title: string }) => void
 }
 
-export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({ isOpen, onClose, categories }) => {
-  const { form, showCreateCategory, setShowCreateCategory, isSubmitting, handleSubmit } = useCourseForm(isOpen)
+export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({
+  isOpen,
+  onClose,
+  categories,
+  socketIdRef,
+  onPending,
+}) => {
+  const { form, showCreateCategory, setShowCreateCategory, isSubmitting, handleSubmit } =
+    useCourseForm(isOpen)
 
   const { videoInfo, isLoading, resetVideoInfo } = useYouTubeValidation(
     form.watch("youtubeUrl"),
@@ -31,7 +40,7 @@ export const CreateCourseModal: FunctionComponent<CreateCourseModalProps> = ({ i
   }
 
   const onSubmit = (data: any) => {
-    handleSubmit(data, videoInfo, handleClose)
+    handleSubmit(data, videoInfo, socketIdRef.current ?? "", handleClose, onPending)
   }
 
   if (!isOpen) return null

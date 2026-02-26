@@ -1,11 +1,13 @@
 import os
+import time
+import tempfile
+import json
 from flask import Blueprint, Flask, abort, jsonify, request
 from dotenv import load_dotenv
 from agent import QuestionGenerator
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_cors import CORS
 import yt_dlp
-
 
 load_dotenv(override=True)
 gen = QuestionGenerator()
@@ -47,6 +49,9 @@ def generate_quiz():
         return jsonify({"error": "Invalid YouTube URL"}), 400
 
     transcript = get_transcript(youtube_id, 10)
+    
+    if not transcript:
+        return jsonify({"error": "Failed to extract transcript. Connection may be blocked by YouTube."}), 400
     
     quizset = gen.generate_quiz(transcript)
     quiz_nodes = gen.to_node_format_quiz(quizset)
@@ -150,17 +155,79 @@ def theory_speaking():
     return jsonify({"message": "Theory speaking endpoint placeholder"}), 200
 
 
+# Transcript cache to prevent IP blocking
+transcript_cache = {}
+
 # method
 def get_transcript(video_id: str, max_minutes: int) -> str:
     """
     Fetch transcript from YouTube video and join into one text.
+    Includes caching, delays, and a yt-dlp fallback to prevent IP Blocks.
     :param video_id: YouTube video ID (e.g. "dQw4w9WgXcQ")
     :return: Full transcript as a single string
     """
-    ytt_api = YouTubeTranscriptApi()
-    data = ytt_api.fetch(video_id)
-    transcript = data.to_raw_data()
+    transcript = None
     
+    # 1. Check Cache
+    if video_id in transcript_cache:
+        transcript = transcript_cache[video_id]
+        print(f"Using cached transcript for {video_id}")
+    else:
+        try:
+            # 2. Add delay to protect against rate limits during continuous generation
+            time.sleep(1)
+            
+            # 3. Try youtube_transcript_api first
+            transcript = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript_cache[video_id] = transcript
+            print(f"Successfully fetched transcript via youtube_transcript_api for {video_id}")
+            
+        except Exception as e:
+            print(f"youtube_transcript_api failed for {video_id}: {e}")
+            print("Attempting to fallback to yt-dlp...")
+            
+            try:
+                # 4. Fallback to yt-dlp if it's an IP Block or other error
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    ydl_opts = {
+                        'skip_download': True,
+                        'writesubtitles': True,
+                        'writeautomaticsub': True,
+                        'subtitleslangs': ['en'],
+                        'subtitlesformat': 'json3',
+                        'outtmpl': f'{tmpdir}/%(id)s.%(ext)s',
+                        'quiet': True,
+                    }
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
+                    
+                    # Read the downloaded json3 subtitle
+                    for fname in os.listdir(tmpdir):
+                        if fname.endswith('.json3'):
+                            with open(os.path.join(tmpdir, fname), 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                                transcript = []
+                                for event in data.get('events', []):
+                                    segs = event.get('segs', [])
+                                    text = "".join([s.get('utf8', '') for s in segs if 'utf8' in s])
+                                    if text.strip():
+                                        start_ms = event.get('tStartMs', 0)
+                                        transcript.append({'text': text.strip(), 'start': start_ms / 1000.0})
+                            break
+                            
+                if transcript:
+                    transcript_cache[video_id] = transcript
+                    print(f"Successfully fetched transcript via yt-dlp for {video_id}")
+                else:
+                    raise Exception("No transcript could be parsed from yt-dlp download")
+                    
+            except Exception as fallback_err:
+                print(f"yt-dlp fallback also failed: {fallback_err}")
+                return ""
+
+    if not transcript:
+        return ""
+        
     max_seconds = max_minutes * 60
     limited_transcript = [
         entry['text'] 

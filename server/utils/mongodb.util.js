@@ -29,3 +29,24 @@ class MongoDB {
 }
 
 module.exports = new MongoDB();
+
+// // PRO
+// class DataBase {
+//   constructor() {
+//     this.connect();
+//   }
+//   connect(uri) {
+//     mongoose.connect(uri).then(_ => console.log('Connected mongoDB Success'))
+//       .catch(error => console.log(`Error connect: ${error}`))
+//     return DataBase.instance
+//   }
+//   static getInstance() {
+//     if (!DataBase.instance) {
+//       DataBase.instance = new DataBase()
+//     }
+//     return DataBase.instance
+//   }
+// }
+
+// const instanceMongodb = DataBase.getInstance()
+// module.exports = instanceMongodb

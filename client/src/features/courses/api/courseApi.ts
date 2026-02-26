@@ -69,15 +69,19 @@ export const courseApi = {
   createCourse: async (courseData: {
     youtubeUrl: string;
     categoryId: string;
+    socketId: string;
   }) => {
+    const { socketId, ...rest } = courseData;
     const formData = new FormData();
-    for (const key in courseData) {
-      formData.append(key, (courseData as any)[key]);
+    for (const key in rest) {
+      formData.append(key, (rest as any)[key]);
     }
 
-    const response = await api.post<ApiResponse<Course>>("/api/course", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await api.post<ApiResponse<Course>>(
+      `/api/course?socketId=${encodeURIComponent(socketId)}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
 
     if (!response.data) {
       throw new Error("Failed to create course");

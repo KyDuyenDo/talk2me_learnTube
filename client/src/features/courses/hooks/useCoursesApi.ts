@@ -64,7 +64,7 @@ export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { youtubeUrl: string; categoryId: string }) =>
+    mutationFn: (data: { youtubeUrl: string; categoryId: string; socketId: string }) =>
       courseApi.createCourse(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: courseKeys.all });
